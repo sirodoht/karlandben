@@ -11,9 +11,9 @@
             --bg-deep: #050608;
             --bg-mid: #0a0c0f;
             --bg-light: #111318;
-            --fog-1: rgba(130, 150, 175, 0.08);
-            --fog-2: rgba(90, 110, 135, 0.04);
-            --fog-3: rgba(60, 80, 105, 0.06);
+            --fog-1: rgba(140, 130, 175, 0.08);
+            --fog-2: rgba(110, 90, 135, 0.04);
+            --fog-3: rgba(80, 60, 105, 0.06);
             --text-primary: #e8eef5;
             --text-secondary: #6b7a8d;
             --text-muted: #4a5568;
@@ -21,7 +21,7 @@
             --accent-glow: rgba(168, 174, 184, 0.35);
             --border-subtle: rgba(100, 120, 140, 0.08);
             --card-bg: rgba(10, 12, 15, 0.85);
-            
+
             --display: 'Cormorant Garamond', Georgia, serif;
             --body: 'Sora', system-ui, sans-serif;
         }
@@ -49,8 +49,8 @@
             z-index: 0;
         }
 
-        /* Atmospheric gradient overlay */
-        .atmosphere {
+        /* Stars overlay */
+        .stars {
             position: fixed;
             top: 0;
             left: 0;
@@ -58,25 +58,38 @@
             height: 100%;
             pointer-events: none;
             z-index: 1;
-            background:
-                radial-gradient(ellipse at 20% 80%, var(--fog-1) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 20%, var(--fog-2) 0%, transparent 40%),
-                radial-gradient(ellipse at 50% 50%, var(--fog-3) 0%, transparent 60%);
-            animation: atmosphereShift 18s ease-in-out infinite;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.8), transparent),
+                radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.6), transparent),
+                radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.9), transparent),
+                radial-gradient(2px 2px at 160px 120px, rgba(255,255,255,0.7), transparent),
+                radial-gradient(1px 1px at 230px 80px, rgba(255,255,255,0.8), transparent),
+                radial-gradient(2px 2px at 300px 150px, rgba(255,255,255,0.5), transparent),
+                radial-gradient(1px 1px at 350px 60px, rgba(255,255,255,0.9), transparent),
+                radial-gradient(2px 2px at 450px 200px, rgba(255,255,255,0.6), transparent),
+                radial-gradient(1px 1px at 500px 100px, rgba(255,255,255,0.7), transparent),
+                radial-gradient(1px 1px at 600px 250px, rgba(255,255,255,0.8), transparent),
+                radial-gradient(2px 2px at 700px 180px, rgba(255,255,255,0.5), transparent),
+                radial-gradient(1px 1px at 800px 90px, rgba(255,255,255,0.9), transparent),
+                radial-gradient(1px 1px at 50px 300px, rgba(255,255,255,0.6), transparent),
+                radial-gradient(2px 2px at 150px 400px, rgba(255,255,255,0.7), transparent),
+                radial-gradient(1px 1px at 280px 350px, rgba(255,255,255,0.8), transparent),
+                radial-gradient(2px 2px at 400px 500px, rgba(255,255,255,0.5), transparent),
+                radial-gradient(1px 1px at 550px 450px, rgba(255,255,255,0.9), transparent),
+                radial-gradient(1px 1px at 720px 380px, rgba(255,255,255,0.6), transparent),
+                radial-gradient(2px 2px at 850px 520px, rgba(255,255,255,0.7), transparent),
+                radial-gradient(1px 1px at 950px 300px, rgba(255,255,255,0.8), transparent);
+            background-repeat: repeat;
+            background-size: 1000px 600px;
+            animation: twinkle 4s ease-in-out infinite;
         }
 
-        @keyframes atmosphereShift {
-            0%, 100% {
-                opacity: 0.5;
-                transform: translateX(0) scale(1);
-            }
-            50% {
-                opacity: 0.7;
-                transform: translateX(-2%) scale(1.02);
-            }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 0.8; }
         }
 
-        /* Vignette overlay */
+        /* Vignette overlay - space portal effect */
         .vignette {
             position: fixed;
             top: 0;
@@ -85,7 +98,18 @@
             height: 100%;
             pointer-events: none;
             z-index: 2;
-            background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.6) 100%);
+            background: radial-gradient(ellipse at center, transparent 40%, rgba(2,0,8,0.8) 100%);
+        }
+
+        /* Constellation canvas */
+        #constellation-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
         }
 
         /* Film grain overlay */
@@ -97,9 +121,9 @@
             height: 200%;
             pointer-events: none;
             z-index: 3;
-            opacity: 0.035;
+            opacity: 0.008;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-            animation: grainShift 8s steps(10) infinite;
+            animation: grainShift 200s linear infinite;
         }
 
         @keyframes grainShift {
@@ -338,7 +362,6 @@
 
         .section-alt {
             padding: 3rem 0;
-            position: relative;
         }
 
         .section-alt::before {
@@ -460,7 +483,7 @@
 
         /* Reduce motion preference */
         @media (prefers-reduced-motion: reduce) {
-            .atmosphere, .grain {
+            .grain {
                 animation: none;
             }
             .fade-in {
@@ -472,7 +495,8 @@
 </head>
 <body>
     <canvas id="fog-canvas"></canvas>
-    <div class="atmosphere"></div>
+    <div class="stars"></div>
+    <canvas id="constellation-canvas"></canvas>
     <div class="vignette"></div>
     <div class="grain"></div>
 
@@ -501,7 +525,7 @@
     </main>
 
     <script>
-        // WebGL Fog Effect
+        // Storm Cloud Turbulence
         (function() {
             const canvas = document.getElementById('fog-canvas');
             const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
@@ -513,7 +537,6 @@
 
             // Check for reduced motion preference
             const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-            const particleCount = prefersReducedMotion ? 20 : 50;
 
             // Resize canvas
             function resize() {
@@ -525,67 +548,156 @@
             resize();
             window.addEventListener('resize', resize, { passive: true });
 
-            // Vertex shader for fog particles
+            // Full-screen quad vertex shader
             const vsSource = `
                 attribute vec2 a_position;
-                attribute float a_size;
-                attribute float a_opacity;
+                void main() {
+                    gl_Position = vec4(a_position, 0.0, 1.0);
+                }
+            `;
+
+            // Storm Cloud Turbulence with Lightning
+            const fsSource = `
+                precision mediump float;
 
                 uniform vec2 u_resolution;
                 uniform float u_time;
                 uniform vec2 u_mouse;
 
-                varying float v_opacity;
-                varying vec2 v_center;
-
-                void main() {
-                    v_opacity = a_opacity;
-
-                    // Parallax effect based on mouse
-                    float parallaxX = u_mouse.x * 0.1;
-                    float parallaxY = u_mouse.y * 0.1;
-
-                    // Subtle movement over time
-                    float time = u_time * 0.0015;
-                    float moveX = sin(time + a_position.x * 3.0) * 0.02;
-                    float moveY = cos(time + a_position.y * 2.0) * 0.015;
-
-                    vec2 position = a_position;
-                    position.x += parallaxX + moveX;
-                    position.y += parallaxY + moveY;
-
-                    // Convert to clip space
-                    vec2 clipSpace = ((position / u_resolution) * 2.0) - 1.0;
-                    clipSpace.y = -clipSpace.y;
-
-                    gl_Position = vec4(clipSpace, 0.0, 1.0);
-                    gl_PointSize = a_size;
-
-                    v_center = clipSpace;
+                // Hash function for random values
+                float hash(vec2 p) {
+                    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
                 }
-            `;
 
-            // Fragment shader for soft fog particles
-            const fsSource = `
-                precision mediump float;
+                // 2D noise
+                float noise(vec2 p) {
+                    vec2 i = floor(p);
+                    vec2 f = fract(p);
+                    f = f * f * (3.0 - 2.0 * f);
 
-                varying float v_opacity;
-                varying vec2 v_center;
+                    float a = hash(i);
+                    float b = hash(i + vec2(1.0, 0.0));
+                    float c = hash(i + vec2(0.0, 1.0));
+                    float d = hash(i + vec2(1.0, 1.0));
 
-                uniform vec3 u_color;
+                    return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+                }
+
+                // Fractal Brownian Motion for turbulent clouds
+                float fbm(vec2 p) {
+                    float value = 0.0;
+                    float amplitude = 0.5;
+                    float frequency = 1.0;
+
+                    for (int i = 0; i < 5; i++) {
+                        value += amplitude * noise(p * frequency);
+                        amplitude *= 0.5;
+                        frequency *= 2.0;
+                    }
+
+                    return value;
+                }
+
+                // Turbulent cloud noise - imperceptible internal movement
+                float turbulentClouds(vec2 p, float time) {
+                    vec2 q = vec2(0.0);
+
+                    // Domain warping - flowing clouds
+                    q.x = fbm(p + time * 1.0);
+                    q.y = fbm(p + vec2(1.0) + time * 0.75);
+
+                    vec2 r = vec2(0.0);
+                    r.x = fbm(p + q + vec2(1.7, 9.2) + time * 0.5);
+                    r.y = fbm(p + q + vec2(8.3, 2.8) + time * 0.625);
+
+                    // Final turbulence layer
+                    float f = fbm(p + r);
+
+                    return f;
+                }
+
+                // Lightning flash pattern
+                float lightning(float time, vec2 uv) {
+                    // Create occasional flash events
+                    float flashInterval = 8.0; // 8 seconds between potential flashes
+                    float flashPhase = mod(time * 0.125, flashInterval);
+
+                    // Build up energy then release
+                    float energy = smoothstep(0.0, 100.0, flashPhase) * smoothstep(120.0, 115.0, flashPhase);
+
+                    // Random flash pattern
+                    float flashNoise = hash(uv * 10.0 + floor(time * 0.125));
+                    float flash = step(0.992, flashNoise) * energy;
+
+                    // Multiple flickers within the main flash
+                    float flicker = sin(time * 5.0) * 0.5 + 0.5;
+                    flash *= flicker;
+
+                    return flash;
+                }
 
                 void main() {
-                    // Calculate distance from center of point
-                    vec2 coord = gl_PointCoord - vec2(0.5);
-                    float dist = length(coord);
+                    // Normalize coordinates
+                    vec2 uv = gl_FragCoord.xy / u_resolution.xy;
+                    vec2 centered = uv * 2.0 - 1.0;
+                    centered.x *= u_resolution.x / u_resolution.y;
 
-                    // Soft radial falloff
-                    float alpha = smoothstep(0.5, 0.0, dist);
+                    // Storm with visible cloud movement
+                    float time = u_time * 0.0001;
 
-                    // Add some noise-like variation
-                    float noise = sin(gl_FragCoord.x * 0.1) * sin(gl_FragCoord.y * 0.1) * 0.1 + 0.9;
+                    // Independent storm - no mouse influence
+                    vec2 cloudPos = centered * 1.5;
 
-                    gl_FragColor = vec4(u_color, v_opacity * alpha * noise * 0.6);
+                    // Multiple turbulent layers with visible drift
+                    float drift1 = time * 0.02;
+                    float drift2 = time * 0.012;
+                    float drift3 = time * 0.007;
+                    
+                    float clouds1 = turbulentClouds(cloudPos * 0.8 + vec2(drift1, 0.0), time);
+                    float clouds2 = turbulentClouds(cloudPos * 1.2 - vec2(drift2, drift2 * 0.2) + vec2(5.2), time * 0.002);
+                    float clouds3 = turbulentClouds(cloudPos * 2.0 + vec2(0.0, drift3) + vec2(10.0), time * 0.00125);
+
+                    // Combine cloud layers
+                    float cloudDensity = clouds1 * 0.5 + clouds2 * 0.35 + clouds3 * 0.15;
+
+                    // Sharpen edges for dramatic cloud formations
+                    cloudDensity = pow(cloudDensity, 0.7);
+                    cloudDensity = smoothstep(0.3, 0.8, cloudDensity);
+
+                    // Cosmic nebula palette
+                    vec3 deepSpace = vec3(0.01, 0.01, 0.03);      // Deep space void
+                    vec3 darkNebula = vec3(0.15, 0.05, 0.22);     // Dark violet nebula
+                    vec3 midNebula = vec3(0.35, 0.12, 0.45);     // Rich purple nebula
+                    vec3 brightNebula = vec3(0.55, 0.25, 0.65);  // Magenta highlights
+                    vec3 cyanGlow = vec3(0.2, 0.5, 0.7);         // Cyan gas clouds
+
+                    // Mix nebula colors with cosmic glow
+                    vec3 nebulaColor = mix(deepSpace, darkNebula, smoothstep(0.0, 0.4, cloudDensity));
+                    nebulaColor = mix(nebulaColor, midNebula, smoothstep(0.3, 0.7, cloudDensity));
+                    nebulaColor = mix(nebulaColor, brightNebula, smoothstep(0.6, 0.9, cloudDensity));
+                    
+                    // Add cyan gas wisps to brightest areas
+                    float cyanMask = smoothstep(0.75, 0.95, cloudDensity);
+                    nebulaColor = mix(nebulaColor, cyanGlow, cyanMask * 0.4);
+
+                    // Cosmic energy bursts
+                    float flash = lightning(u_time, uv);
+                    vec3 energyColor = vec3(0.7, 0.9, 1.0) * flash * 0.6;
+
+                    // Add energy bursts to nebula
+                    nebulaColor += energyColor * cloudDensity;
+
+                    // Vignette for storm focus
+                    float vignette = 1.0 - length(centered * 0.6);
+                    vignette = smoothstep(0.0, 0.7, vignette);
+
+                    // Alpha - dense clouds are more opaque
+                    float alpha = cloudDensity * 0.65 * vignette;
+
+                    // Boost alpha for storm intensity
+                    alpha = mix(alpha, 0.5, flash * 0.3);
+
+                    gl_FragColor = vec4(nebulaColor, alpha);
                 }
             `;
 
@@ -608,6 +720,8 @@
                 const vertexShader = compileShader(gl.VERTEX_SHADER, vsSource);
                 const fragmentShader = compileShader(gl.FRAGMENT_SHADER, fsSource);
 
+                if (!vertexShader || !fragmentShader) return null;
+
                 const program = gl.createProgram();
                 gl.attachShader(program, vertexShader);
                 gl.attachShader(program, fragmentShader);
@@ -621,57 +735,43 @@
             }
 
             const program = createProgram(vsSource, fsSource);
+            if (!program) {
+                console.log('Failed to create shader program');
+                return;
+            }
 
             // Get attribute and uniform locations
             const a_position = gl.getAttribLocation(program, 'a_position');
-            const a_size = gl.getAttribLocation(program, 'a_size');
-            const a_opacity = gl.getAttribLocation(program, 'a_opacity');
             const u_resolution = gl.getUniformLocation(program, 'u_resolution');
             const u_time = gl.getUniformLocation(program, 'u_time');
             const u_mouse = gl.getUniformLocation(program, 'u_mouse');
-            const u_color = gl.getUniformLocation(program, 'u_color');
 
-            // Generate fog particle data
-            const positions = new Float32Array(particleCount * 2);
-            const sizes = new Float32Array(particleCount);
-            const opacities = new Float32Array(particleCount);
-            const velocities = [];
+            // Full-screen quad vertices
+            const positions = new Float32Array([
+                -1, -1,
+                 1, -1,
+                -1,  1,
+                -1,  1,
+                 1, -1,
+                 1,  1
+            ]);
 
-            for (let i = 0; i < particleCount; i++) {
-                // Random position across screen
-                positions[i * 2] = Math.random() * canvas.width;
-                positions[i * 2 + 1] = Math.random() * canvas.height;
-
-                // Random size (large for fog effect)
-                sizes[i] = Math.random() * 300 + 150;
-
-                // Random opacity (more subtle and mysterious)
-                opacities[i] = Math.random() * 0.2 + 0.05;
-
-                // Velocity for drifting (slower, more moody)
-                velocities.push({
-                    x: (Math.random() - 0.5) * 0.25,
-                    y: (Math.random() - 0.5) * 0.18
-                });
-            }
-
-            // Create buffers
             const positionBuffer = gl.createBuffer();
-            const sizeBuffer = gl.createBuffer();
-            const opacityBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
 
-            // Mouse tracking
-            let mouseX = 0;
-            let mouseY = 0;
-            let targetMouseX = 0;
-            let targetMouseY = 0;
+            // Mouse tracking with smooth interpolation
+            let mouseX = 0.0;
+            let mouseY = 0.0;
+            let targetMouseX = 0.0;
+            let targetMouseY = 0.0;
 
             document.addEventListener('mousemove', (e) => {
-                targetMouseX = (e.clientX / window.innerWidth) * 2 - 1;
-                targetMouseY = -((e.clientY / window.innerHeight) * 2 - 1);
+                targetMouseX = (e.clientX / window.innerWidth) * 2.0 - 1.0;
+                targetMouseY = -((e.clientY / window.innerHeight) * 2.0 - 1.0);
             }, { passive: true });
 
-            // Enable blending for transparency
+            // Enable blending for transparent fog
             gl.enable(gl.BLEND);
             gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
@@ -679,13 +779,17 @@
             let startTime = performance.now();
             let isVisible = true;
             let animationId;
+            let frameCount = 0;
 
             // Visibility handling
             document.addEventListener('visibilitychange', () => {
                 isVisible = !document.hidden;
+                if (isVisible) {
+                    startTime = performance.now() - (frameCount * 16.67); // Maintain time continuity
+                }
             });
 
-            // Render loop
+            // Render loop with adaptive quality
             function render() {
                 if (!isVisible) {
                     animationId = requestAnimationFrame(render);
@@ -694,76 +798,242 @@
 
                 const currentTime = performance.now();
                 const elapsed = currentTime - startTime;
+                frameCount++;
 
                 // Smooth mouse interpolation
-                mouseX += (targetMouseX - mouseX) * 0.12;
-                mouseY += (targetMouseY - mouseY) * 0.12;
+                mouseX += (targetMouseX - mouseX) * 0.08;
+                mouseY += (targetMouseY - mouseY) * 0.08;
 
-                // Update particle positions
-                for (let i = 0; i < particleCount; i++) {
-                    positions[i * 2] += velocities[i].x;
-                    positions[i * 2 + 1] += velocities[i].y;
-
-                    // Wrap around screen
-                    if (positions[i * 2] > canvas.width + 200) {
-                        positions[i * 2] = -200;
-                        positions[i * 2 + 1] = Math.random() * canvas.height;
-                    }
-                    if (positions[i * 2] < -200) {
-                        positions[i * 2] = canvas.width + 200;
-                    }
-                    if (positions[i * 2 + 1] > canvas.height + 200) {
-                        positions[i * 2 + 1] = -200;
-                        positions[i * 2] = Math.random() * canvas.width;
-                    }
-                    if (positions[i * 2 + 1] < -200) {
-                        positions[i * 2 + 1] = canvas.height + 200;
-                    }
-                }
-
-                // Clear with transparent background
+                // Clear with transparency
                 gl.clearColor(0.0, 0.0, 0.0, 0.0);
                 gl.clear(gl.COLOR_BUFFER_BIT);
 
                 // Use program
                 gl.useProgram(program);
 
-                // Update position buffer
+                // Bind and enable position attribute
                 gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-                gl.bufferData(gl.ARRAY_BUFFER, positions, gl.DYNAMIC_DRAW);
                 gl.enableVertexAttribArray(a_position);
                 gl.vertexAttribPointer(a_position, 2, gl.FLOAT, false, 0, 0);
 
-                // Update size buffer
-                gl.bindBuffer(gl.ARRAY_BUFFER, sizeBuffer);
-                gl.bufferData(gl.ARRAY_BUFFER, sizes, gl.STATIC_DRAW);
-                gl.enableVertexAttribArray(a_size);
-                gl.vertexAttribPointer(a_size, 1, gl.FLOAT, false, 0, 0);
-
-                // Update opacity buffer
-                gl.bindBuffer(gl.ARRAY_BUFFER, opacityBuffer);
-                gl.bufferData(gl.ARRAY_BUFFER, opacities, gl.STATIC_DRAW);
-                gl.enableVertexAttribArray(a_opacity);
-                gl.vertexAttribPointer(a_opacity, 1, gl.FLOAT, false, 0, 0);
-
                 // Set uniforms
                 gl.uniform2f(u_resolution, canvas.width, canvas.height);
-                gl.uniform1f(u_time, elapsed);
+                gl.uniform1f(u_time, prefersReducedMotion ? 0.0 : elapsed);
                 gl.uniform2f(u_mouse, mouseX, mouseY);
 
-                // Draw in multiple passes for depth
-                // First pass: deeper fog (dark, mysterious)
-                gl.uniform3f(u_color, 0.25, 0.32, 0.42); // Deep blue-grey
-                gl.drawArrays(gl.POINTS, 0, Math.floor(particleCount / 2));
-                
-                // Second pass: closer fog (slightly warmer, but still moody)
-                gl.uniform3f(u_color, 0.38, 0.44, 0.52); // Muted grey
-                gl.drawArrays(gl.POINTS, Math.floor(particleCount / 2), Math.ceil(particleCount / 2));
+                // Draw full-screen quad
+                gl.drawArrays(gl.TRIANGLES, 0, 6);
 
                 animationId = requestAnimationFrame(render);
             }
 
             render();
+        })();
+
+        // Constellation Drawing
+        (function() {
+            const canvas = document.getElementById('constellation-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Star positions matching the CSS radial-gradient stars
+            const stars = [
+                { x: 0.020, y: 0.030, size: 2 },
+                { x: 0.040, y: 0.070, size: 2 },
+                { x: 0.090, y: 0.040, size: 1 },
+                { x: 0.160, y: 0.120, size: 2 },
+                { x: 0.230, y: 0.080, size: 1 },
+                { x: 0.300, y: 0.150, size: 2 },
+                { x: 0.350, y: 0.060, size: 1 },
+                { x: 0.450, y: 0.200, size: 2 },
+                { x: 0.500, y: 0.100, size: 1 },
+                { x: 0.600, y: 0.250, size: 1 },
+                { x: 0.700, y: 0.180, size: 2 },
+                { x: 0.800, y: 0.090, size: 1 },
+                { x: 0.050, y: 0.300, size: 1 },
+                { x: 0.150, y: 0.400, size: 2 },
+                { x: 0.280, y: 0.350, size: 1 },
+                { x: 0.400, y: 0.500, size: 2 },
+                { x: 0.550, y: 0.450, size: 1 },
+                { x: 0.720, y: 0.380, size: 1 },
+                { x: 0.850, y: 0.520, size: 2 },
+                { x: 0.950, y: 0.300, size: 1 },
+            ];
+            
+            let mouseX = -1000;
+            let mouseY = -1000;
+            let activeConnections = new Map(); // star index -> opacity
+            let animationId;
+            let isVisible = true;
+            
+            // Shooting stars
+            let shootingStars = [];
+            let lastShootingStarTime = 0;
+            let nextShootingStarDelay = 10000 + Math.random() * 20000; // 10-30s
+            
+            function spawnShootingStar() {
+                // Random starting edge: 0=top, 1=right, 2=left (avoid bottom)
+                const edge = Math.floor(Math.random() * 3);
+                let x, y, vx, vy;
+                
+                const speed = 4 + Math.random() * 3; // Speed: 4-7 pixels per frame
+                const angle = (Math.random() * 60 + 30) * Math.PI / 180; // 30-90 degree angle
+                
+                switch(edge) {
+                    case 0: // Top edge - shoot down-right or down-left
+                        x = Math.random() * canvas.width;
+                        y = -10;
+                        vx = (Math.random() > 0.5 ? 1 : -1) * speed * Math.cos(angle);
+                        vy = speed * Math.sin(angle);
+                        break;
+                    case 1: // Right edge - shoot down-left
+                        x = canvas.width + 10;
+                        y = Math.random() * canvas.height * 0.5;
+                        vx = -speed * Math.cos(angle);
+                        vy = speed * Math.sin(angle);
+                        break;
+                    case 2: // Left edge - shoot down-right
+                        x = -10;
+                        y = Math.random() * canvas.height * 0.5;
+                        vx = speed * Math.cos(angle);
+                        vy = speed * Math.sin(angle);
+                        break;
+                }
+                
+                shootingStars.push({
+                    x: x,
+                    y: y,
+                    vx: vx,
+                    vy: vy,
+                    life: 1.0,
+                    trail: [],
+                    maxTrail: 15 + Math.floor(Math.random() * 10) // 15-25 trail segments
+                });
+            }
+            
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resize();
+            window.addEventListener('resize', resize, { passive: true });
+            
+            // Track mouse
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            }, { passive: true });
+            
+            // Check visibility
+            document.addEventListener('visibilitychange', () => {
+                isVisible = !document.hidden;
+            });
+            
+            function getDistance(x1, y1, x2, y2) {
+                return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+            }
+            
+            function drawConstellation() {
+                if (!isVisible) {
+                    animationId = requestAnimationFrame(drawConstellation);
+                    return;
+                }
+                
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                const connectRadius = 150; // Pixels within which to connect
+                const maxConnections = 3; // Max stars to connect to at once
+                
+                // Update active connections based on mouse proximity
+                const nearbyStars = [];
+                
+                stars.forEach((star, index) => {
+                    const sx = star.x * canvas.width;
+                    const sy = star.y * canvas.height;
+                    const dist = getDistance(mouseX, mouseY, sx, sy);
+                    
+                    if (dist < connectRadius) {
+                        nearbyStars.push({ index, dist, x: sx, y: sy });
+                    }
+                });
+                
+                // Sort by distance and take closest
+                nearbyStars.sort((a, b) => a.dist - b.dist);
+                const connectedStars = nearbyStars.slice(0, maxConnections);
+                
+                // Fade in new connections
+                connectedStars.forEach(({ index, dist }) => {
+                    const targetOpacity = 1 - (dist / connectRadius);
+                    const current = activeConnections.get(index) || 0;
+                    activeConnections.set(index, current + (targetOpacity - current) * 0.15);
+                });
+                
+                // Fade out old connections
+                activeConnections.forEach((opacity, index) => {
+                    const isStillConnected = connectedStars.some(s => s.index === index);
+                    if (!isStillConnected) {
+                        const newOpacity = opacity * 0.92;
+                        if (newOpacity < 0.01) {
+                            activeConnections.delete(index);
+                        } else {
+                            activeConnections.set(index, newOpacity);
+                        }
+                    }
+                });
+                
+                // Draw connections
+                if (connectedStars.length > 1) {
+                    ctx.strokeStyle = 'rgba(180, 140, 220, 0.6)';
+                    ctx.lineWidth = 1.5;
+                    ctx.shadowBlur = 8;
+                    ctx.shadowColor = 'rgba(200, 160, 255, 0.5)';
+                    
+                    // Draw lines between connected stars
+                    for (let i = 0; i < connectedStars.length - 1; i++) {
+                        const star1 = connectedStars[i];
+                        const star2 = connectedStars[i + 1];
+                        const avgOpacity = (activeConnections.get(star1.index) + activeConnections.get(star2.index)) / 2;
+                        
+                        ctx.globalAlpha = avgOpacity * 0.7;
+                        ctx.beginPath();
+                        ctx.moveTo(star1.x, star1.y);
+                        ctx.lineTo(star2.x, star2.y);
+                        ctx.stroke();
+                    }
+                    
+                    // Draw line from mouse to closest star
+                    if (connectedStars.length > 0) {
+                        const closest = connectedStars[0];
+                        const opacity = activeConnections.get(closest.index);
+                        ctx.globalAlpha = opacity * 0.5;
+                        ctx.beginPath();
+                        ctx.moveTo(mouseX, mouseY);
+                        ctx.lineTo(closest.x, closest.y);
+                        ctx.stroke();
+                    }
+                }
+                
+                // Draw active star glows
+                ctx.shadowBlur = 12;
+                ctx.shadowColor = 'rgba(255, 200, 150, 0.8)';
+                activeConnections.forEach((opacity, index) => {
+                    const star = stars[index];
+                    const sx = star.x * canvas.width;
+                    const sy = star.y * canvas.height;
+                    
+                    ctx.globalAlpha = opacity;
+                    ctx.fillStyle = 'rgba(255, 220, 180, 0.9)';
+                    ctx.beginPath();
+                    ctx.arc(sx, sy, star.size + 1, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                
+                ctx.globalAlpha = 1;
+                ctx.shadowBlur = 0;
+                
+                animationId = requestAnimationFrame(drawConstellation);
+            }
+            
+            drawConstellation();
         })();
     </script>
 </body>
