@@ -7,13 +7,29 @@ mod services;
 mod session;
 mod templates;
 
+use clap::Parser;
 use email::EmailService;
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
 use std::str::FromStr;
 use tracing::info;
 
+#[derive(Parser)]
+#[command(name = "fogpub")]
+#[command(about = "A social network for vouching for people you've lived with")]
+struct Args {
+    /// Port to listen on
+    #[arg(short, long, default_value = "3000")]
+    port: u16,
+
+    /// Path to SQLite database file
+    #[arg(short, long, default_value = "./fogpub.db")]
+    database: String,
+}
+
 #[tokio::main]
 async fn main() {
+    let args = Args::parse();
+
     tracing_subscriber::fmt()
         .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
         .with_target(true)
@@ -22,9 +38,10 @@ async fn main() {
         .compact()
         .init();
 
-    info!("Starting fogpub server");
+    info!(port = args.port, database = %args.database, "Starting fogpub server");
 
-    let opts = SqliteConnectOptions::from_str("sqlite://./fogpub.db")
+    let db_url = format!("sqlite://{}", args.database);
+    let opts = SqliteConnectOptions::from_str(&db_url)
         .expect("failed to parse sqlite url")
         .create_if_missing(true);
     let pool = SqlitePoolOptions::new()
@@ -51,7 +68,7 @@ async fn main() {
 
     let app = app::create_app(pool, email_service);
 
-    let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
+    let listener = tokio::net::TcpListener::bind(format!("127.0.0.1:{}", args.port))
         .await
         .unwrap();
     info!(address = %listener.local_addr().unwrap(), "Server listening");
