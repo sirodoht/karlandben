@@ -19,7 +19,7 @@ use tracing::{debug, error, info, instrument, warn};
 #[instrument(skip(session), fields(user_id, has_name))]
 pub async fn index(session: Session) -> Html<String> {
     tracing::Span::current()
-        .record("user_id", &session.user_id.unwrap_or(0))
+        .record("user_id", session.user_id.unwrap_or(0))
         .record("has_name", session.user_name.is_some());
 
     let tmpl = IndexTemplate {
@@ -47,7 +47,7 @@ pub async fn login(
     Form(form): Form<EmailForm>,
 ) -> impl IntoResponse {
     let email = form.email.trim().to_lowercase();
-    tracing::Span::current().record("email", &email.as_str());
+    tracing::Span::current().record("email", email.as_str());
 
     info!("Login attempt initiated");
 
@@ -211,7 +211,7 @@ pub async fn signup(
     Form(form): Form<EmailForm>,
 ) -> impl IntoResponse {
     let email = form.email.trim().to_lowercase();
-    tracing::Span::current().record("email", &email.as_str());
+    tracing::Span::current().record("email", email.as_str());
 
     info!("Signup attempt initiated");
 
@@ -364,8 +364,8 @@ pub async fn verify(
     let code = form.code.trim();
 
     tracing::Span::current()
-        .record("email", &email.as_str())
-        .record("purpose", &form.purpose.as_str());
+        .record("email", email.as_str())
+        .record("purpose", form.purpose.as_str());
 
     info!("Verification attempt");
 
@@ -529,7 +529,7 @@ pub async fn register_name(
     let name = form.name.trim();
 
     tracing::Span::current()
-        .record("email", &email.as_str())
+        .record("email", email.as_str())
         .record("name_len", name.len());
 
     info!("Name registration initiated");
@@ -655,10 +655,10 @@ pub async fn register_name(
 #[instrument(skip(session))]
 pub async fn logout(Extension(pool): Extension<SqlitePool>, session: Session) -> impl IntoResponse {
     // Delete session from database if exists
-    if let Some(token) = session.token {
-        if let Err(e) = database::delete_session(&pool, &token).await {
-            error!(error = ?e, "Failed to delete session");
-        }
+    if let Some(token) = session.token
+        && let Err(e) = database::delete_session(&pool, &token).await
+    {
+        error!(error = ?e, "Failed to delete session");
     }
 
     if let Some(user_id) = session.user_id {
