@@ -1,0 +1,24 @@
+[Unit]
+Description=karlandben
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=deploy
+Group=www-data
+WorkingDirectory=/var/www/karlandben
+ExecStart=/var/www/karlandben/target/release/karlandben --port 4000 --database /var/www/karlandben/karlandben.db
+Environment="RUST_LOG=karlandben=debug"
+Environment="EMAIL_BACKEND=smtp"
+Environment="RUST_LOG=SMTP_HOST=smtp.postmarkapp.com"
+Environment="RUST_LOG=SMTP_USER="
+Environment="RUST_LOG=SMTP_PASSWORD="
+Environment="RUST_LOG=SMTP_FROM=noreply@karlandben.com"
+Environment="RUST_LOG=SMTP_PORT=587"
+Environment="RUST_LOG=SMTP_TLS=starttls"
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
