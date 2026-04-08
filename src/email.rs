@@ -75,7 +75,7 @@ impl EmailService {
     }
 
     pub async fn send_sign_in_code(&self, to_email: &str, code: &str) -> Result<(), String> {
-        let subject = format!("{} is your fogpub sign-in code", code);
+        let subject = format!("{} is your karlandben sign-in code", code);
         let body = format!(
             "Your 6-digit sign-in code is: {}\n\nThis code will expire in 15 minutes.",
             code

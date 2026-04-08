@@ -1,4 +1,4 @@
-export RUST_LOG=fogpub=debug
+export RUST_LOG=karlandben=debug
 
 # Email backend configuration
 # Options:
@@ -10,6 +10,6 @@ export EMAIL_BACKEND=console
 export SMTP_HOST=smtp.postmarkapp.com
 export SMTP_USER=
 export SMTP_PASSWORD=
-export SMTP_FROM=noreply@fogpub.space
+export SMTP_FROM=noreply@karlandben.com
 export SMTP_PORT=587
 export SMTP_TLS=starttls  # Options: starttls, required, opportunistic, none

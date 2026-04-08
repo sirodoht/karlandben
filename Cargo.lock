@@ -557,24 +557,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "fogpub"
-version = "0.1.0"
-dependencies = [
- "askama",
- "axum",
- "chrono",
- "clap",
- "lettre",
- "rand",
- "serde",
- "sqlx",
- "thiserror",
- "tokio",
- "tracing",
- "tracing-subscriber",
-]
-
-[[package]]
 name = "foldhash"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1030,6 +1012,24 @@ checksum = "2e04e2ef80ce82e13552136fabeef8a5ed1f985a96805761cbb9a2c34e7664d9"
 dependencies = [
  "once_cell",
  "wasm-bindgen",
+]
+
+[[package]]
+name = "karlandben"
+version = "0.1.0"
+dependencies = [
+ "askama",
+ "axum",
+ "chrono",
+ "clap",
+ "lettre",
+ "rand",
+ "serde",
+ "sqlx",
+ "thiserror",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]

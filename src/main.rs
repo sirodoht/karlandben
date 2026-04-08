@@ -14,7 +14,7 @@ use std::str::FromStr;
 use tracing::info;
 
 #[derive(Parser)]
-#[command(name = "fogpub")]
+#[command(name = "karlandben")]
 #[command(about = "A social network for vouching for people you've lived with")]
 struct Args {
     /// Port to listen on
@@ -22,7 +22,7 @@ struct Args {
     port: u16,
 
     /// Path to SQLite database file
-    #[arg(short, long, default_value = "./fogpub.db")]
+    #[arg(short, long, default_value = "./karlandben.db")]
     database: String,
 }
 
@@ -38,7 +38,7 @@ async fn main() {
         .compact()
         .init();
 
-    info!(port = args.port, database = %args.database, "Starting fogpub server");
+    info!(port = args.port, database = %args.database, "Starting karlandben server");
 
     let db_url = format!("sqlite://{}", args.database);
     let opts = SqliteConnectOptions::from_str(&db_url)
