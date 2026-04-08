@@ -1072,13 +1072,16 @@
             let animationId = null;
             let running = false;
 
+            // Check reduced motion preference
+            const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
             // Shooting stars
             let shootingStars = [];
             let lastShootingStarTime = 0;
             let nextShootingStarDelay = 5000 + Math.random() * 15000; // 5-20s
 
             function start() {
-                if (!running && !document.hidden) {
+                if (!running && !document.hidden && !prefersReducedMotion) {
                     running = true;
                     animationId = requestAnimationFrame(drawConstellation);
                 }
@@ -1325,7 +1328,7 @@
             }
 
             // Start the loop
-            start();
+            if (!prefersReducedMotion) start();
         })();
 
         // Friendly Ghost Interactions
