@@ -376,15 +376,17 @@
 
         .section-alt {
             padding: 3rem 0;
+            position: relative;
         }
 
         .section-alt::before {
             content: '';
             position: absolute;
-            left: -50vw;
-            right: -50vw;
+            left: 50%;
             top: 0;
             bottom: 0;
+            width: 100vw;
+            transform: translateX(-50%);
             background: var(--fog-1);
             z-index: -1;
         }
