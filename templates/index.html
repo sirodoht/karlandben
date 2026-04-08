@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 
-{% block title %}fogpub{% endblock %}
+{% block title %}fogpub — vouch for people you've lived with{% endblock %}
 
 {% block content %}
 {% if logged_in %}
@@ -10,9 +10,45 @@
         <h1>Welcome back!</h1>
     {% endif %}
 {% else %}
-    <h1>Welcome to fogpub</h1>
-    <p style="margin-top: 2rem;">
-        <a href="/login" class="button">Sign in</a>
-    </p>
+    <div class="hero">
+        <h1>Vouch for the people<br>you've lived with</h1>
+        <div class="divider"></div>
+        <p class="hero-subtitle">
+            Fogpub is a simple social network that allows people to vouch for friends or acquaintances
+            they have lived in the same house, whether that was for a few days or multiple years.
+        </p>
+        <a href="/login" class="button">Get started</a>
+    </div>
+
+    <div class="section-alt">
+        <h2>Why?</h2>
+        <div class="divider"></div>
+        <p>
+            Lots of our friends move between London and San Francisco. We want to help them and we want to host them.
+            Inviting someone you don't know can be risky. We want a simple way to ask:
+        </p>
+
+        <div class="use-cases">
+            <div class="use-case">
+                <p>
+                    "Does any of my friends know this person? I'd love to invite them to my house
+                    but I'm a bit afraid to invite a stranger."
+                </p>
+            </div>
+            <div class="use-case">
+                <p>
+                    "Do I know anyone in London/San Francisco? I'm going there for two weeks and
+                    I'd love to stay with someone who I have some connection to."
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="cta-section">
+        <p style="font-size: 1.1rem; color: var(--color-text);">
+            Build trust through the people you've shared a home with.
+        </p>
+        <a href="/login" class="button">Join Fogpub</a>
+    </div>
 {% endif %}
 {% endblock %}
