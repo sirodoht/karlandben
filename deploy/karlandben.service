@@ -11,12 +11,12 @@ WorkingDirectory=/var/www/karlandben
 ExecStart=/var/www/karlandben/target/release/karlandben --port 4000 --database /var/www/karlandben/karlandben.db
 Environment="RUST_LOG=karlandben=debug"
 Environment="EMAIL_BACKEND=smtp"
-Environment="RUST_LOG=SMTP_HOST=smtp.postmarkapp.com"
-Environment="RUST_LOG=SMTP_USER="
-Environment="RUST_LOG=SMTP_PASSWORD="
-Environment="RUST_LOG=SMTP_FROM=noreply@karlandben.com"
-Environment="RUST_LOG=SMTP_PORT=587"
-Environment="RUST_LOG=SMTP_TLS=starttls"
+Environment="SMTP_HOST=smtp.postmarkapp.com"
+Environment="SMTP_USER="
+Environment="SMTP_PASSWORD="
+Environment="SMTP_FROM=noreply@karlandben.com"
+Environment="SMTP_PORT=587"
+Environment="SMTP_TLS=starttls"
 Restart=always
 RestartSec=5
 
