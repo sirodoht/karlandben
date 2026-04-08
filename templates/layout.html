@@ -837,17 +837,17 @@
                     vec2 centered = uv * 2.0 - 1.0;
                     centered.x *= u_resolution.x / u_resolution.y;
 
-                    // Storm with visible cloud movement
-                    float time = u_time * 0.0001;
+                    // Single base time scale (seconds)
+                    float t = u_time * 0.001;
 
                     vec2 cloudPos = centered * 1.5;
 
                     // Two turbulent layers with visible drift
-                    float drift1 = time * 0.02;
-                    float drift2 = time * 0.012;
+                    float drift1 = t * 0.002;
+                    float drift2 = t * 0.0012;
 
-                    float clouds1 = turbulentClouds(cloudPos * 0.85 + vec2(drift1, 0.0), time);
-                    float clouds2 = turbulentClouds(cloudPos * 1.35 + vec2(4.7, -drift2 * 0.15), time * 0.5);
+                    float clouds1 = turbulentClouds(cloudPos * 0.85 + vec2(drift1, 0.0), t * 0.1);
+                    float clouds2 = turbulentClouds(cloudPos * 1.35 + vec2(4.7, -drift2 * 0.15), t * 0.05);
 
                     // Combine cloud layers (2 layers instead of 3)
                     float cloudDensity = clouds1 * 0.65 + clouds2 * 0.35;
@@ -873,8 +873,7 @@
                     nebulaColor = mix(nebulaColor, cyanGlow, cyanMask * 0.4);
 
                     // Cosmic energy bursts
-                    float timeSeconds = u_time * 0.001;
-                    float flash = lightning(timeSeconds, uv);
+                    float flash = lightning(t, uv);
                     vec3 energyColor = vec3(0.7, 0.9, 1.0) * flash * 0.6;
 
                     // Add energy bursts to nebula
