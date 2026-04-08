@@ -379,18 +379,6 @@
             position: relative;
         }
 
-        .section-alt::before {
-            content: '';
-            position: absolute;
-            left: 50%;
-            top: 0;
-            bottom: 0;
-            width: 100vw;
-            transform: translateX(-50%);
-            background: var(--fog-1);
-            z-index: -1;
-        }
-
         .use-cases {
             display: grid;
             gap: 1.5rem;
@@ -790,9 +778,9 @@
             // Check for reduced motion preference
             const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-            // Resize canvas
+            // Resize canvas - cap DPR at 1.5 for balance of quality/performance
             function resize() {
-                const dpr = Math.min(window.devicePixelRatio || 1, 2);
+                const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
                 canvas.width = window.innerWidth * dpr;
                 canvas.height = window.innerHeight * dpr;
                 gl.viewport(0, 0, canvas.width, canvas.height);
@@ -808,13 +796,12 @@
                 }
             `;
 
-            // Storm Cloud Turbulence with Lightning
+            // Storm Cloud Turbulence with Lightning - slightly optimized
             const fsSource = `
                 precision mediump float;
 
                 uniform vec2 u_resolution;
                 uniform float u_time;
-                uniform vec2 u_mouse;
 
                 // Hash function for random values
                 float hash(vec2 p) {
@@ -871,7 +858,7 @@
                 // Lightning flash pattern
                 float lightning(float time, vec2 uv) {
                     // Create occasional flash events
-                    float flashInterval = 8.0; // 8 seconds between potential flashes
+                    float flashInterval = 8.0;
                     float flashPhase = mod(time * 0.125, flashInterval);
 
                     // Build up energy then release
@@ -897,7 +884,6 @@
                     // Storm with visible cloud movement
                     float time = u_time * 0.0001;
 
-                    // Independent storm - no mouse influence
                     vec2 cloudPos = centered * 1.5;
 
                     // Multiple turbulent layers with visible drift
@@ -916,12 +902,12 @@
                     cloudDensity = pow(cloudDensity, 0.7);
                     cloudDensity = smoothstep(0.3, 0.8, cloudDensity);
 
-                    // Cosmic nebula palette
-                    vec3 deepSpace = vec3(0.01, 0.01, 0.03);      // Deep space void
-                    vec3 darkNebula = vec3(0.15, 0.05, 0.22);     // Dark violet nebula
-                    vec3 midNebula = vec3(0.35, 0.12, 0.45);     // Rich purple nebula
-                    vec3 brightNebula = vec3(0.55, 0.25, 0.65);  // Magenta highlights
-                    vec3 cyanGlow = vec3(0.2, 0.5, 0.7);         // Cyan gas clouds
+                    // Cosmic nebula palette - RESTORED ORIGINAL COLORS
+                    vec3 deepSpace = vec3(0.01, 0.01, 0.03);
+                    vec3 darkNebula = vec3(0.15, 0.05, 0.22);
+                    vec3 midNebula = vec3(0.35, 0.12, 0.45);
+                    vec3 brightNebula = vec3(0.55, 0.25, 0.65);
+                    vec3 cyanGlow = vec3(0.2, 0.5, 0.7);
 
                     // Mix nebula colors with cosmic glow
                     vec3 nebulaColor = mix(deepSpace, darkNebula, smoothstep(0.0, 0.4, cloudDensity));
@@ -943,7 +929,7 @@
                     float vignette = 1.0 - length(centered * 0.6);
                     vignette = smoothstep(0.0, 0.7, vignette);
 
-                    // Alpha - dense clouds are more opaque
+                    // Alpha - dense clouds are more opaque (RESTORED to original 0.65)
                     float alpha = cloudDensity * 0.65 * vignette;
 
                     // Boost alpha for storm intensity
@@ -996,7 +982,6 @@
             const a_position = gl.getAttribLocation(program, 'a_position');
             const u_resolution = gl.getUniformLocation(program, 'u_resolution');
             const u_time = gl.getUniformLocation(program, 'u_time');
-            const u_mouse = gl.getUniformLocation(program, 'u_mouse');
 
             // Full-screen quad vertices
             const positions = new Float32Array([
@@ -1012,17 +997,6 @@
             gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
             gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
 
-            // Mouse tracking with smooth interpolation
-            let mouseX = 0.0;
-            let mouseY = 0.0;
-            let targetMouseX = 0.0;
-            let targetMouseY = 0.0;
-
-            document.addEventListener('mousemove', (e) => {
-                targetMouseX = (e.clientX / window.innerWidth) * 2.0 - 1.0;
-                targetMouseY = -((e.clientY / window.innerHeight) * 2.0 - 1.0);
-            }, { passive: true });
-
             // Enable blending for transparent fog
             gl.enable(gl.BLEND);
             gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
@@ -1032,29 +1006,31 @@
             let isVisible = true;
             let animationId;
             let frameCount = 0;
+            let lastFrameTime = 0;
+            const targetFPS = 30; // Cap at 30fps instead of 60
+            const frameInterval = 1000 / targetFPS;
 
-            // Visibility handling
+            // Visibility handling - pause when hidden
             document.addEventListener('visibilitychange', () => {
                 isVisible = !document.hidden;
                 if (isVisible) {
-                    startTime = performance.now() - (frameCount * 16.67); // Maintain time continuity
+                    startTime = performance.now() - (frameCount * 33.33); // Maintain time continuity
                 }
             });
 
-            // Render loop with adaptive quality
-            function render() {
-                if (!isVisible) {
-                    animationId = requestAnimationFrame(render);
-                    return;
-                }
+            // Render loop with frame capping
+            function render(currentTime) {
+                animationId = requestAnimationFrame(render);
 
-                const currentTime = performance.now();
-                const elapsed = currentTime - startTime;
+                if (!isVisible || prefersReducedMotion) return;
+
+                // Frame capping - skip frames to hit target FPS
+                const elapsed = currentTime - lastFrameTime;
+                if (elapsed < frameInterval) return;
+                lastFrameTime = currentTime - (elapsed % frameInterval);
+
+                const timeSinceStart = currentTime - startTime;
                 frameCount++;
-
-                // Smooth mouse interpolation
-                mouseX += (targetMouseX - mouseX) * 0.08;
-                mouseY += (targetMouseY - mouseY) * 0.08;
 
                 // Clear with transparency
                 gl.clearColor(0.0, 0.0, 0.0, 0.0);
@@ -1070,16 +1046,13 @@
 
                 // Set uniforms
                 gl.uniform2f(u_resolution, canvas.width, canvas.height);
-                gl.uniform1f(u_time, prefersReducedMotion ? 0.0 : elapsed);
-                gl.uniform2f(u_mouse, mouseX, mouseY);
+                gl.uniform1f(u_time, timeSinceStart);
 
                 // Draw full-screen quad
                 gl.drawArrays(gl.TRIANGLES, 0, 6);
-
-                animationId = requestAnimationFrame(render);
             }
 
-            render();
+            render(performance.now());
         })();
 
         // Constellation Drawing
