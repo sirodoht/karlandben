@@ -1,0 +1,7 @@
+export RUST_LOG=fogpub=debug
+export SMTP_HOST=smtp.postmarkapp.com
+export SMTP_USER=
+export SMTP_PASSWORD=
+export SMTP_FROM=noreply@fogpub.space
+export SMTP_PORT=587
+export SMTP_TLS=starttls  # Options: starttls, required, opportunistic, none

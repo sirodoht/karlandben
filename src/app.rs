@@ -1,0 +1,20 @@
+use crate::{email::EmailService, handlers};
+use axum::{
+    routing::{get, post},
+    Extension, Router,
+};
+use sqlx::SqlitePool;
+
+pub fn create_app(pool: SqlitePool, email_service: Option<EmailService>) -> Router {
+    Router::new()
+        .route("/", get(handlers::index))
+        // Auth routes
+        .route("/login", get(handlers::login_page).post(handlers::login))
+        .route("/signup", get(handlers::signup_page).post(handlers::signup))
+        .route("/verify", post(handlers::verify))
+        .route("/profile", post(handlers::register_name))
+        .route("/logout", post(handlers::logout))
+        // Add pool to extensions so Session extractor can access it
+        .layer(Extension(pool))
+        .layer(Extension(email_service))
+}

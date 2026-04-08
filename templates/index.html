@@ -3,5 +3,19 @@
 {% block title %}fogpub{% endblock %}
 
 {% block content %}
-<p>{{ message }}</p>
+{% if logged_in %}
+    {% if let Some(name) = name %}
+        <p>Welcome back, {{ name }}!</p>
+    {% else %}
+        <p>Welcome back!</p>
+    {% endif %}
+    <form method="post" action="/logout">
+        <button type="submit">Log Out</button>
+    </form>
+{% else %}
+    <h1>Welcome to Fogpub</h1>
+    <p>
+        <a href="/login">Log In</a> or <a href="/signup">Sign Up</a>
+    </p>
+{% endif %}
 {% endblock %}
