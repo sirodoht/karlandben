@@ -1119,9 +1119,17 @@
                 });
             }
 
+            // Cache star pixel positions - updated on resize
+            let starPixels = [];
+
             function resize() {
                 canvas.width = window.innerWidth;
                 canvas.height = window.innerHeight;
+                starPixels = stars.map(star => ({
+                    x: star.x * canvas.width,
+                    y: star.y * canvas.height,
+                    size: star.size
+                }));
             }
             resize();
             window.addEventListener('resize', resize, { passive: true });
@@ -1229,13 +1237,11 @@
                 // Update active connections based on mouse proximity
                 const nearbyStars = [];
 
-                stars.forEach((star, index) => {
-                    const sx = star.x * canvas.width;
-                    const sy = star.y * canvas.height;
-                    const distSq = getDistanceSq(mouseX, mouseY, sx, sy);
+                starPixels.forEach((star, index) => {
+                    const distSq = getDistanceSq(mouseX, mouseY, star.x, star.y);
 
                     if (distSq < connectRadiusSq) {
-                        nearbyStars.push({ index, distSq, x: sx, y: sy });
+                        nearbyStars.push({ index, distSq, x: star.x, y: star.y });
                     }
                 });
 
@@ -1299,14 +1305,12 @@
                 ctx.shadowBlur = 12;
                 ctx.shadowColor = 'rgba(255, 200, 150, 0.8)';
                 activeConnections.forEach((opacity, index) => {
-                    const star = stars[index];
-                    const sx = star.x * canvas.width;
-                    const sy = star.y * canvas.height;
+                    const star = starPixels[index];
 
                     ctx.globalAlpha = opacity;
                     ctx.fillStyle = 'rgba(255, 220, 180, 0.9)';
                     ctx.beginPath();
-                    ctx.arc(sx, sy, star.size + 1, 0, Math.PI * 2);
+                    ctx.arc(star.x, star.y, star.size + 1, 0, Math.PI * 2);
                     ctx.fill();
                 });
 
