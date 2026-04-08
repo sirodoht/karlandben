@@ -23,7 +23,7 @@ pub async fn index(session: Session) -> Html<String> {
         .record("has_name", session.user_name.is_some());
 
     let tmpl = IndexTemplate {
-        logged_in: session.user_id.is_some(),
+        logged_in: session.is_authenticated(),
         name: session.user_name,
     };
     Html(tmpl.render().unwrap())
