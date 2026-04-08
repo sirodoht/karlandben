@@ -119,6 +119,23 @@ pub async fn user_needs_name(pool: &SqlitePool, email: &str) -> Result<bool, DbE
     Ok(result.is_none() || matches!(result, Some((None,))))
 }
 
+// Get or create user with null name - returns (user_id, was_created)
+pub async fn get_or_create_user(pool: &SqlitePool, email: &str) -> Result<(i64, bool), DbError> {
+    // First, try to get existing user
+    if let Some((id, _)) = get_user_by_email(pool, email).await? {
+        return Ok((id, false));
+    }
+
+    // User doesn't exist, create with null name
+    let id = sqlx::query("INSERT INTO users (email, name) VALUES (?, NULL)")
+        .bind(email)
+        .execute(pool)
+        .await?
+        .last_insert_rowid();
+
+    Ok((id, true))
+}
+
 // Get user by email
 pub async fn get_user_by_email(
     pool: &SqlitePool,
@@ -168,13 +185,13 @@ pub async fn create_session(
 pub async fn validate_session(
     pool: &SqlitePool,
     token: &str,
-) -> Result<Option<(i64, Option<String>)>, DbError> {
+) -> Result<Option<(i64, Option<String>, String)>, DbError> {
     use chrono::Utc;
 
     let now = Utc::now().naive_utc();
 
-    let result: Option<(i64, Option<String>)> = sqlx::query_as(
-        "SELECT s.user_id, u.name FROM sessions s 
+    let result: Option<(i64, Option<String>, String)> = sqlx::query_as(
+        "SELECT s.user_id, u.name, u.email FROM sessions s 
          JOIN users u ON s.user_id = u.id 
          WHERE s.token = ? AND s.expires_at > ?",
     )

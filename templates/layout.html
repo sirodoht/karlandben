@@ -162,6 +162,9 @@
             <div class="nav-links">
                 {% block nav %}
                 {% if logged_in %}
+                    {% if let Some(email) = email %}
+                        <a href="/profile" style="color: #aaa; font-size: 0.9rem;">{{ email }}</a>
+                    {% endif %}
                     <form method="post" action="/logout" style="display: inline;">
                         <button type="submit">Log out</button>
                     </form>

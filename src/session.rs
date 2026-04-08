@@ -15,6 +15,7 @@ pub const SESSION_MAX_AGE_DAYS: i64 = 730;
 pub struct Session {
     pub user_id: Option<i64>,
     pub user_name: Option<String>,
+    pub email: Option<String>,
     pub token: Option<String>,
 }
 
@@ -50,9 +51,10 @@ where
         if let Some(token) = token {
             // Validate token in database
             match database::validate_session(&pool, &token).await {
-                Ok(Some((user_id, user_name))) => Ok(Session {
+                Ok(Some((user_id, user_name, email))) => Ok(Session {
                     user_id: Some(user_id),
                     user_name,
+                    email: Some(email),
                     token: Some(token),
                 }),
                 Ok(None) => {
@@ -60,6 +62,7 @@ where
                     Ok(Session {
                         user_id: None,
                         user_name: None,
+                        email: None,
                         token: None,
                     })
                 }
@@ -68,6 +71,7 @@ where
                     Ok(Session {
                         user_id: None,
                         user_name: None,
+                        email: None,
                         token: None,
                     })
                 }
@@ -77,6 +81,7 @@ where
             Ok(Session {
                 user_id: None,
                 user_name: None,
+                email: None,
                 token: None,
             })
         }

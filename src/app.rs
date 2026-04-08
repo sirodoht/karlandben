@@ -11,7 +11,10 @@ pub fn create_app(pool: SqlitePool, email_service: Option<EmailService>) -> Rout
         // Auth routes
         .route("/login", get(handlers::login_page).post(handlers::login))
         .route("/verify", post(handlers::verify))
-        .route("/profile", post(handlers::register_name))
+        .route(
+            "/profile",
+            get(handlers::profile_page).post(handlers::register_name),
+        )
         .route("/logout", post(handlers::logout))
         // Add pool to extensions so Session extractor can access it
         .layer(Extension(pool))

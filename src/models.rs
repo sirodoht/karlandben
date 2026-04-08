@@ -13,6 +13,5 @@ pub struct VerifyForm {
 
 #[derive(Debug, serde::Deserialize)]
 pub struct NameForm {
-    pub email: String,
     pub name: String,
 }

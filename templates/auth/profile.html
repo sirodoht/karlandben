@@ -1,19 +1,23 @@
 {% extends "layout.html" %}
 
-{% block title %}Complete your profile - fogpub{% endblock %}
+{% block title %}Profile - fogpub{% endblock %}
 
 {% block content %}
 <h1>Profile</h1>
 
-<p>Welcome! What's your name?</p>
+{% if let Some(name) = name %}
+    <p><strong>Name:</strong> {{ name }}</p>
+    <p><strong>Email:</strong> {{ form_email }}</p>
+{% else %}
+    <p>Welcome! What's your name?</p>
 
-{% if let Some(error) = error %}
-<div class="error">{{ error }}</div>
+    {% if let Some(error) = error %}
+    <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <form method="post" action="/profile">
+        <input type="text" name="name" required autofocus>
+        <button type="submit">Continue</button>
+    </form>
 {% endif %}
-
-<form method="post" action="/profile">
-    <input type="hidden" name="email" value="{{ email }}">
-    <input type="text" name="name" required autofocus>
-    <button type="submit">Continue</button>
-</form>
 {% endblock %}
