@@ -5,17 +5,16 @@
 {% block content %}
 {% if logged_in %}
     {% if let Some(name) = name %}
-        <p>Welcome back, {{ name }}!</p>
+        <h1>Welcome back, {{ name }}!</h1>
     {% else %}
-        <p>Welcome back!</p>
+        <h1>Welcome back!</h1>
     {% endif %}
-    <form method="post" action="/logout">
-        <button type="submit">Log Out</button>
-    </form>
 {% else %}
-    <h1>Welcome to Fogpub</h1>
-    <p>
-        <a href="/login">Log In</a> or <a href="/signup">Sign Up</a>
+    <h1>Welcome to fogpub</h1>
+    <p>A simple place to share your writing.</p>
+    <p style="margin-top: 2rem;">
+        <a href="/login" class="button">Log in</a>
+        <a href="/signup" class="button" style="background: transparent; color: #1a1a1a; border: 1px solid #1a1a1a;">Sign up</a>
     </p>
 {% endif %}
 {% endblock %}

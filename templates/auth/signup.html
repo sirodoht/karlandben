@@ -1,20 +1,20 @@
-{% extends "../layout.html" %}
+{% extends "layout.html" %}
 
-{% block title %}Sign Up{% endblock %}
+{% block title %}Sign up - fogpub{% endblock %}
+
+{% block nav %}{% endblock %}
 
 {% block content %}
-<h1>Sign Up</h1>
+<h1>Sign up</h1>
 
 {% if let Some(error) = error %}
-<p style="color: #dc2626;">{{ error }}</p>
+<div class="error">{{ error }}</div>
 {% endif %}
 
 <form method="post" action="/signup">
-    <label>
-        Email
-        <input type="email" name="email" required autofocus>
-    </label>
-    <button type="submit">Send Signup Code</button>
+    <label>Email</label>
+    <input type="email" name="email" required autofocus>
+    <button type="submit">Send signup code</button>
 </form>
 
 <p>Already have an account? <a href="/login">Log in</a></p>

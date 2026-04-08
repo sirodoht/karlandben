@@ -1,23 +1,23 @@
-{% extends "../layout.html" %}
+{% extends "layout.html" %}
 
-{% block title %}Verify{% endblock %}
+{% block title %}Verify - fogpub{% endblock %}
+
+{% block nav %}{% endblock %}
 
 {% block content %}
-<h1>Enter Verification Code</h1>
+<h1>Enter verification code</h1>
 
-<p>We've sent a 6-digit code to {{ email }}. Enter it below:</p>
+<p>We've sent a 6-digit code to {{ email }}.</p>
 
 {% if let Some(error) = error %}
-<p style="color: #dc2626;">{{ error }}</p>
+<div class="error">{{ error }}</div>
 {% endif %}
 
 <form method="post" action="/verify">
     <input type="hidden" name="email" value="{{ email }}">
     <input type="hidden" name="purpose" value="{{ purpose }}">
-    <label>
-        6-digit code
-        <input type="text" name="code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required autofocus>
-    </label>
+    <label>6-digit code</label>
+    <input type="text" name="code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required autofocus>
     <button type="submit">Verify</button>
 </form>
 {% endblock %}
