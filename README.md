@@ -1,5 +1,11 @@
 # fogpub
 
+## Development
+
+```sh
+cargo watch -x run
+```
+
 ## Commit Message Style
 
 Use [Conventional Commits](https://www.conventionalcommits.org/) format:
