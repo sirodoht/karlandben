@@ -16,11 +16,11 @@ const RATE_LIMIT_HOURS: i64 = 1;
 // Check rate limit: max 3 tokens per hour per email
 pub async fn check_rate_limit(pool: &SqlitePool, email: &str) -> Result<bool, DbError> {
     use chrono::{Duration, Utc};
-    
+
     let since = Utc::now() - Duration::hours(RATE_LIMIT_HOURS);
 
     let count: i64 = sqlx::query_scalar(
-        "SELECT COUNT(*) FROM email_tokens WHERE email = ? AND created_at > ? AND used_at IS NULL"
+        "SELECT COUNT(*) FROM email_tokens WHERE email = ? AND created_at > ? AND used_at IS NULL",
     )
     .bind(email)
     .bind(since.naive_utc())
@@ -38,18 +38,16 @@ pub async fn create_token(
     purpose: &str,
 ) -> Result<(), DbError> {
     use chrono::{Duration, Utc};
-    
+
     let expires_at = Utc::now() + Duration::minutes(TOKEN_EXPIRY_MINUTES);
 
-    sqlx::query(
-        "INSERT INTO email_tokens (email, code, purpose, expires_at) VALUES (?, ?, ?, ?)"
-    )
-    .bind(email)
-    .bind(code)
-    .bind(purpose)
-    .bind(expires_at.naive_utc())
-    .execute(pool)
-    .await?;
+    sqlx::query("INSERT INTO email_tokens (email, code, purpose, expires_at) VALUES (?, ?, ?, ?)")
+        .bind(email)
+        .bind(code)
+        .bind(purpose)
+        .bind(expires_at.naive_utc())
+        .execute(pool)
+        .await?;
 
     Ok(())
 }
@@ -61,7 +59,7 @@ pub async fn validate_and_use_token(
     code: &str,
 ) -> Result<bool, DbError> {
     use chrono::Utc;
-    
+
     let now = Utc::now().naive_utc();
 
     let result: Option<(i64,)> = sqlx::query_as(
@@ -109,15 +107,20 @@ pub async fn update_user_name(pool: &SqlitePool, email: &str, name: &str) -> Res
 
 // Check if user exists
 pub async fn user_exists(pool: &SqlitePool, email: &str) -> Result<bool, DbError> {
-    let result: Option<(i64,)> =
-        sqlx::query_as("SELECT id FROM users WHERE email = ?").bind(email).fetch_optional(pool).await?;
+    let result: Option<(i64,)> = sqlx::query_as("SELECT id FROM users WHERE email = ?")
+        .bind(email)
+        .fetch_optional(pool)
+        .await?;
     Ok(result.is_some())
 }
 
 // Check if user needs to set name
 pub async fn user_needs_name(pool: &SqlitePool, email: &str) -> Result<bool, DbError> {
     let result: Option<(Option<String>,)> =
-        sqlx::query_as("SELECT name FROM users WHERE email = ?").bind(email).fetch_optional(pool).await?;
+        sqlx::query_as("SELECT name FROM users WHERE email = ?")
+            .bind(email)
+            .fetch_optional(pool)
+            .await?;
     Ok(matches!(result, Some((None,))))
 }
 
@@ -136,11 +139,10 @@ pub async fn get_user_by_email(
 
 // Get user id by email
 pub async fn get_user_id_by_email(pool: &SqlitePool, email: &str) -> Result<Option<i64>, DbError> {
-    let result: Option<(i64,)> =
-        sqlx::query_as("SELECT id FROM users WHERE email = ?")
-            .bind(email)
-            .fetch_optional(pool)
-            .await?;
+    let result: Option<(i64,)> = sqlx::query_as("SELECT id FROM users WHERE email = ?")
+        .bind(email)
+        .fetch_optional(pool)
+        .await?;
     Ok(result.map(|(id,)| id))
 }
 
@@ -154,17 +156,15 @@ pub async fn create_session(
     max_age_days: i64,
 ) -> Result<(), DbError> {
     use chrono::{Duration, Utc};
-    
+
     let expires_at = Utc::now() + Duration::days(max_age_days);
 
-    sqlx::query(
-        "INSERT INTO sessions (token, user_id, expires_at) VALUES (?, ?, ?)"
-    )
-    .bind(token)
-    .bind(user_id)
-    .bind(expires_at.naive_utc())
-    .execute(pool)
-    .await?;
+    sqlx::query("INSERT INTO sessions (token, user_id, expires_at) VALUES (?, ?, ?)")
+        .bind(token)
+        .bind(user_id)
+        .bind(expires_at.naive_utc())
+        .execute(pool)
+        .await?;
 
     Ok(())
 }
@@ -175,13 +175,13 @@ pub async fn validate_session(
     token: &str,
 ) -> Result<Option<(i64, Option<String>)>, DbError> {
     use chrono::Utc;
-    
+
     let now = Utc::now().naive_utc();
 
     let result: Option<(i64, Option<String>)> = sqlx::query_as(
         "SELECT s.user_id, u.name FROM sessions s 
          JOIN users u ON s.user_id = u.id 
-         WHERE s.token = ? AND s.expires_at > ?"
+         WHERE s.token = ? AND s.expires_at > ?",
     )
     .bind(token)
     .bind(now)

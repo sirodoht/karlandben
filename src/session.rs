@@ -1,7 +1,7 @@
 use crate::database;
 use axum::{
-    extract::{FromRequestParts},
-    http::{header, HeaderMap, HeaderValue, StatusCode},
+    extract::FromRequestParts,
+    http::{HeaderMap, HeaderValue, StatusCode, header},
     response::{IntoResponse, Response},
 };
 use rand::Rng;
@@ -41,8 +41,7 @@ where
             .get::<SqlitePool>()
             .cloned()
             .ok_or_else(|| {
-                (StatusCode::INTERNAL_SERVER_ERROR, "Database not available")
-                    .into_response()
+                (StatusCode::INTERNAL_SERVER_ERROR, "Database not available").into_response()
             })?;
 
         // Extract token from cookie
@@ -51,13 +50,11 @@ where
         if let Some(token) = token {
             // Validate token in database
             match database::validate_session(&pool, &token).await {
-                Ok(Some((user_id, user_name))) => {
-                    Ok(Session {
-                        user_id: Some(user_id),
-                        user_name,
-                        token: Some(token),
-                    })
-                }
+                Ok(Some((user_id, user_name))) => Ok(Session {
+                    user_id: Some(user_id),
+                    user_name,
+                    token: Some(token),
+                }),
                 Ok(None) => {
                     // Token not found or expired
                     Ok(Session {
@@ -90,7 +87,7 @@ where
 pub fn generate_session_token() -> String {
     const CHARSET: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
     const TOKEN_LEN: usize = 32;
-    
+
     let mut rng = rand::thread_rng();
     (0..TOKEN_LEN)
         .map(|_| {
@@ -117,7 +114,7 @@ pub fn extract_session_token(headers: &HeaderMap) -> Option<String> {
 /// Build a session cookie header value
 pub fn build_session_cookie(token: &str) -> Option<HeaderValue> {
     let max_age_seconds = SESSION_MAX_AGE_DAYS * 24 * 60 * 60;
-    
+
     HeaderValue::from_str(&format!(
         "session_token={token}; HttpOnly; Path=/; SameSite=Lax; Max-Age={max_age_seconds}"
     ))
