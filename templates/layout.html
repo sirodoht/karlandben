@@ -491,6 +491,234 @@
                 opacity: 1;
             }
         }
+
+        /* Friendly Ghost - Casper's cousin */
+        .ghost-container {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            z-index: 100;
+            pointer-events: auto;
+        }
+
+        .ghost {
+            width: 70px;
+            height: 90px;
+            position: relative;
+            cursor: pointer;
+            animation: ghostFloat 3s ease-in-out infinite;
+            transition: transform 0.3s ease;
+        }
+
+        .ghost:hover {
+            transform: scale(1.1);
+        }
+
+        .ghost-body {
+            width: 70px;
+            height: 75px;
+            background: linear-gradient(180deg, 
+                rgba(255, 255, 255, 0.95) 0%, 
+                rgba(240, 248, 255, 0.85) 50%,
+                rgba(230, 240, 250, 0.75) 100%);
+            border-radius: 50% 50% 45% 45%;
+            position: relative;
+            box-shadow: 
+                0 0 30px rgba(200, 220, 255, 0.4),
+                0 0 60px rgba(180, 200, 255, 0.2),
+                inset 0 -5px 15px rgba(180, 200, 255, 0.3);
+            animation: ghostWobble 4s ease-in-out infinite;
+        }
+
+        .ghost-eyes {
+            position: absolute;
+            top: 28px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+        }
+
+        .eye {
+            width: 9px;
+            height: 12px;
+            background: linear-gradient(180deg, #2a2a3a 0%, #1a1a2e 100%);
+            border-radius: 50%;
+            position: relative;
+            animation: blink 4s infinite;
+        }
+
+        .eye::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 3px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+        }
+
+        .ghost-mouth {
+            position: absolute;
+            bottom: 22px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 12px;
+            height: 6px;
+            background: linear-gradient(180deg, #2a2a3a 0%, #1a1a2e 100%);
+            border-radius: 0 0 50% 50%;
+            transition: all 0.2s ease;
+        }
+
+        .ghost:hover .ghost-mouth {
+            height: 10px;
+            border-radius: 50%;
+            width: 14px;
+        }
+
+        .ghost-blush {
+            position: absolute;
+            top: 42px;
+            width: 10px;
+            height: 6px;
+            background: rgba(255, 150, 180, 0.4);
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .ghost-blush.left { left: 10px; }
+        .ghost-blush.right { right: 10px; }
+
+        .ghost:hover .ghost-blush {
+            opacity: 1;
+        }
+
+        .ghost-tail {
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 2px;
+        }
+
+        .tail-segment {
+            width: 18px;
+            height: 20px;
+            background: linear-gradient(180deg, 
+                rgba(230, 240, 250, 0.7) 0%, 
+                rgba(230, 240, 250, 0) 100%);
+            border-radius: 0 0 50% 50%;
+            animation: tailWave 2s ease-in-out infinite;
+        }
+
+        .tail-segment:nth-child(2) { animation-delay: -0.3s; }
+        .tail-segment:nth-child(3) { animation-delay: -0.6s; }
+
+        .ghost-waves {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 3px;
+            opacity: 0.6;
+        }
+
+        .ghost-waves span {
+            width: 10px;
+            height: 8px;
+            background: linear-gradient(180deg, 
+                rgba(230, 240, 250, 0.5) 0%, 
+                transparent 100%);
+            border-radius: 50%;
+            animation: waveMotion 1.5s ease-in-out infinite;
+        }
+
+        .ghost-waves span:nth-child(1) { animation-delay: 0s; }
+        .ghost-waves span:nth-child(2) { animation-delay: -0.2s; }
+        .ghost-waves span:nth-child(3) { animation-delay: -0.4s; }
+        .ghost-waves span:nth-child(4) { animation-delay: -0.6s; }
+        .ghost-waves span:nth-child(5) { animation-delay: -0.8s; }
+
+        /* Ghost speech bubble */
+        .ghost-bubble {
+            position: absolute;
+            bottom: 100px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #1a1a2e;
+            padding: 10px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            white-space: nowrap;
+            opacity: 0;
+            transform: translateY(10px) scale(0.8);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            pointer-events: none;
+        }
+
+        .ghost-bubble.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .ghost-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            right: 20px;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid rgba(255, 255, 255, 0.95);
+        }
+
+        /* Animations */
+        @keyframes ghostFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        @keyframes ghostWobble {
+            0%, 100% { border-radius: 50% 50% 45% 45%; }
+            25% { border-radius: 48% 52% 47% 43%; }
+            50% { border-radius: 52% 48% 43% 47%; }
+            75% { border-radius: 47% 53% 48% 42%; }
+        }
+
+        @keyframes blink {
+            0%, 45%, 55%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(0.1); }
+        }
+
+        @keyframes tailWave {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-5px) rotate(3deg); }
+        }
+
+        @keyframes waveMotion {
+            0%, 100% { transform: translateY(0); opacity: 0.6; }
+            50% { transform: translateY(-3px); opacity: 0.3; }
+        }
+
+        /* Hide ghost on mobile to save space */
+        @media (max-width: 768px) {
+            .ghost-container {
+                display: none;
+            }
+        }
+
+        /* Reduce motion for ghost */
+        @media (prefers-reduced-motion: reduce) {
+            .ghost, .ghost-body, .eye, .tail-segment, .ghost-waves span {
+                animation: none;
+            }
+        }
     </style>
 </head>
 <body>
@@ -499,6 +727,30 @@
     <canvas id="constellation-canvas"></canvas>
     <div class="vignette"></div>
     <div class="grain"></div>
+
+    <!-- Friendly Ghost -->
+    <div class="ghost-container">
+        <div class="ghost" id="casper">
+            <div class="ghost-body">
+                <div class="ghost-eyes">
+                    <div class="eye left"></div>
+                    <div class="eye right"></div>
+                </div>
+                <div class="ghost-mouth"></div>
+                <div class="ghost-blush left"></div>
+                <div class="ghost-blush right"></div>
+            </div>
+            <div class="ghost-tail">
+                <div class="tail-segment"></div>
+                <div class="tail-segment"></div>
+                <div class="tail-segment"></div>
+            </div>
+            <div class="ghost-waves">
+                <span></span><span></span><span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="ghost-bubble" id="ghost-bubble">boo! 👻</div>
+    </div>
 
     <nav>
         <div class="nav-content">
@@ -1103,6 +1355,107 @@
             }
             
             drawConstellation();
+        })();
+
+        // Friendly Ghost Interactions
+        (function() {
+            const ghost = document.getElementById('casper');
+            const bubble = document.getElementById('ghost-bubble');
+            
+            const messages = [
+                "boo! 👻",
+                "looking for roommates?",
+                "i used to live here too",
+                "the rent is too high",
+                "someone left dishes again",
+                "nice fog today ☁️",
+                "spooky season all year",
+                "been haunting since 2024",
+                "do you believe in ghosts?",
+                "i miss my roommates",
+                "the wifi password is...",
+                "shh, they're sleeping",
+            ];
+            
+            let messageIndex = 0;
+            let bubbleTimeout;
+            
+            // Eye tracking - ghost eyes follow cursor subtly
+            document.addEventListener('mousemove', (e) => {
+                const eyes = ghost.querySelectorAll('.eye');
+                const ghostRect = ghost.getBoundingClientRect();
+                const ghostCenterX = ghostRect.left + ghostRect.width / 2;
+                const ghostCenterY = ghostRect.top + ghostRect.height / 2;
+                
+                const angle = Math.atan2(e.clientY - ghostCenterY, e.clientX - ghostCenterX);
+                const distance = Math.min(3, Math.hypot(e.clientX - ghostCenterX, e.clientY - ghostCenterY) / 100);
+                
+                const x = Math.cos(angle) * distance;
+                const y = Math.sin(angle) * distance;
+                
+                eyes.forEach(eye => {
+                    eye.style.transform = `translate(${x}px, ${y}px)`;
+                });
+            }, { passive: true });
+            
+            // Click to show message
+            ghost.addEventListener('click', () => {
+                // Random message or cycle through
+                const message = messages[Math.floor(Math.random() * messages.length)];
+                bubble.textContent = message;
+                bubble.classList.add('visible');
+                
+                // Playful bounce animation
+                ghost.style.animation = 'none';
+                setTimeout(() => {
+                    ghost.style.animation = 'ghostFloat 3s ease-in-out infinite, ghostBounce 0.5s ease';
+                }, 10);
+                
+                // Reset animation after bounce
+                setTimeout(() => {
+                    ghost.style.animation = 'ghostFloat 3s ease-in-out infinite';
+                }, 500);
+                
+                // Hide bubble after 3 seconds
+                clearTimeout(bubbleTimeout);
+                bubbleTimeout = setTimeout(() => {
+                    bubble.classList.remove('visible');
+                }, 3000);
+            });
+            
+            // Peek-a-boo: Ghost hides when scrolling fast
+            let lastScrollY = window.scrollY;
+            let scrollTimeout;
+            
+            window.addEventListener('scroll', () => {
+                const currentScrollY = window.scrollY;
+                const scrollSpeed = Math.abs(currentScrollY - lastScrollY);
+                
+                if (scrollSpeed > 50) {
+                    ghost.style.transform = 'translateY(100px) scale(0.8)';
+                    ghost.style.opacity = '0.3';
+                }
+                
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(() => {
+                    ghost.style.transform = '';
+                    ghost.style.opacity = '';
+                }, 150);
+                
+                lastScrollY = currentScrollY;
+            }, { passive: true });
+            
+            // Add bounce animation keyframes dynamically
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes ghostBounce {
+                    0%, 100% { transform: scale(1); }
+                    25% { transform: scale(1.2) translateY(-10px); }
+                    50% { transform: scale(0.9) translateY(5px); }
+                    75% { transform: scale(1.1) translateY(-5px); }
+                }
+            `;
+            document.head.appendChild(style);
         })();
     </script>
 </body>
