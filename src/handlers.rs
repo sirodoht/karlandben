@@ -30,7 +30,14 @@ pub async fn index(session: Session) -> Html<String> {
 }
 
 pub async fn login_page() -> impl IntoResponse {
-    Html(LoginTemplate { error: None }.render().unwrap())
+    Html(
+        LoginTemplate {
+            error: None,
+            logged_in: false,
+        }
+        .render()
+        .unwrap(),
+    )
 }
 
 #[instrument(skip(pool, email_service, form), fields(email))]
@@ -48,6 +55,7 @@ pub async fn login(
     if !email.contains('@') {
         return Html(
             LoginTemplate {
+                logged_in: false,
                 error: Some("Invalid email address".to_string()),
             }
             .render()
@@ -70,6 +78,7 @@ pub async fn login(
             error!("Database error checking user existence");
             return Html(
                 LoginTemplate {
+                    logged_in: false,
                     error: Some("Database error".to_string()),
                 }
                 .render()
@@ -82,6 +91,7 @@ pub async fn login(
     if !exists {
         return Html(
             LoginTemplate {
+                logged_in: false,
                 error: Some("No account found. Please sign up first.".to_string()),
             }
             .render()
@@ -102,6 +112,7 @@ pub async fn login(
             error!("Database error checking rate limit");
             return Html(
                 LoginTemplate {
+                    logged_in: false,
                     error: Some("Database error".to_string()),
                 }
                 .render()
@@ -114,6 +125,7 @@ pub async fn login(
     if !allowed {
         return Html(
             LoginTemplate {
+                logged_in: false,
                 error: Some(
                     "Too many attempts. Please wait before requesting another code.".to_string(),
                 ),
@@ -134,6 +146,7 @@ pub async fn login(
             error!(error = ?e, "Failed to create login token");
             return Html(
                 LoginTemplate {
+                    logged_in: false,
                     error: Some("Failed to create login code".to_string()),
                 }
                 .render()
@@ -151,6 +164,7 @@ pub async fn login(
                 error!(email = %email, error = %e, "Failed to send login code email");
                 return Html(
                     LoginTemplate {
+                        logged_in: false,
                         error: Some(
                             "Unable to send verification email. Please try again later."
                                 .to_string(),
@@ -168,6 +182,7 @@ pub async fn login(
 
     Html(
         VerifyTemplate {
+            logged_in: false,
             email,
             purpose: "login".to_string(),
             error: None,
@@ -179,7 +194,14 @@ pub async fn login(
 }
 
 pub async fn signup_page() -> impl IntoResponse {
-    Html(SignupTemplate { error: None }.render().unwrap())
+    Html(
+        SignupTemplate {
+            error: None,
+            logged_in: false,
+        }
+        .render()
+        .unwrap(),
+    )
 }
 
 #[instrument(skip(pool, email_service, form), fields(email))]
@@ -197,6 +219,7 @@ pub async fn signup(
     if !email.contains('@') {
         return Html(
             SignupTemplate {
+                logged_in: false,
                 error: Some("Invalid email address".to_string()),
             }
             .render()
@@ -217,6 +240,7 @@ pub async fn signup(
             error!("Database error checking user existence during signup");
             return Html(
                 SignupTemplate {
+                    logged_in: false,
                     error: Some("Database error".to_string()),
                 }
                 .render()
@@ -229,6 +253,7 @@ pub async fn signup(
     if exists {
         return Html(
             SignupTemplate {
+                logged_in: false,
                 error: Some("Account already exists. Please log in.".to_string()),
             }
             .render()
@@ -249,6 +274,7 @@ pub async fn signup(
             error!("Database error checking rate limit during signup");
             return Html(
                 SignupTemplate {
+                    logged_in: false,
                     error: Some("Database error".to_string()),
                 }
                 .render()
@@ -261,6 +287,7 @@ pub async fn signup(
     if !allowed {
         return Html(
             SignupTemplate {
+                logged_in: false,
                 error: Some(
                     "Too many attempts. Please wait before requesting another code.".to_string(),
                 ),
@@ -281,6 +308,7 @@ pub async fn signup(
             error!(error = ?e, "Failed to create signup token");
             return Html(
                 SignupTemplate {
+                    logged_in: false,
                     error: Some("Failed to create signup code".to_string()),
                 }
                 .render()
@@ -298,6 +326,7 @@ pub async fn signup(
                 error!(email = %email, error = %e, "Failed to send signup code email");
                 return Html(
                     SignupTemplate {
+                        logged_in: false,
                         error: Some(
                             "Unable to send verification email. Please try again later."
                                 .to_string(),
@@ -315,6 +344,7 @@ pub async fn signup(
 
     Html(
         VerifyTemplate {
+            logged_in: false,
             email,
             purpose: "signup".to_string(),
             error: None,
@@ -353,6 +383,7 @@ pub async fn verify(
             error!(error = ?e, "Database error validating token");
             return Html(
                 VerifyTemplate {
+                    logged_in: false,
                     email: email.clone(),
                     purpose: form.purpose.clone(),
                     error: Some("Database error".to_string()),
@@ -367,6 +398,7 @@ pub async fn verify(
     if !valid {
         return Html(
             VerifyTemplate {
+                logged_in: false,
                 email,
                 purpose: form.purpose,
                 error: Some("Invalid or expired code".to_string()),
@@ -380,7 +412,16 @@ pub async fn verify(
     match form.purpose.as_str() {
         "signup" => {
             // For signup, go to name registration page
-            Html(ProfileTemplate { email, error: None }.render().unwrap()).into_response()
+            Html(
+                ProfileTemplate {
+                    email,
+                    error: None,
+                    logged_in: false,
+                }
+                .render()
+                .unwrap(),
+            )
+            .into_response()
         }
         "login" => {
             // For login, check if user needs to set name
@@ -389,6 +430,7 @@ pub async fn verify(
                 Err(_) => {
                     return Html(
                         VerifyTemplate {
+                            logged_in: false,
                             email,
                             purpose: "login".to_string(),
                             error: Some("Database error".to_string()),
@@ -401,7 +443,16 @@ pub async fn verify(
             };
 
             if needs_name {
-                Html(ProfileTemplate { email, error: None }.render().unwrap()).into_response()
+                Html(
+                    ProfileTemplate {
+                        email,
+                        error: None,
+                        logged_in: false,
+                    }
+                    .render()
+                    .unwrap(),
+                )
+                .into_response()
             } else {
                 // Complete login - create session
                 let (user_id, _user_name) = match database::get_user_by_email(&pool, &email).await {
@@ -409,6 +460,7 @@ pub async fn verify(
                     Ok(None) => {
                         return Html(
                             VerifyTemplate {
+                                logged_in: false,
                                 email: email.clone(),
                                 purpose: "login".to_string(),
                                 error: Some("Database error".to_string()),
@@ -421,6 +473,7 @@ pub async fn verify(
                     Err(_) => {
                         return Html(
                             VerifyTemplate {
+                                logged_in: false,
                                 email: email.clone(),
                                 purpose: "login".to_string(),
                                 error: Some("Database error".to_string()),
@@ -450,6 +503,7 @@ pub async fn verify(
                         error!(error = ?e, "Failed to create session");
                         Html(
                             VerifyTemplate {
+                                logged_in: false,
                                 email: email.clone(),
                                 purpose: "login".to_string(),
                                 error: Some("Database error".to_string()),
@@ -486,6 +540,7 @@ pub async fn register_name(
             ProfileTemplate {
                 email,
                 error: Some("Name is required".to_string()),
+                logged_in: false,
             }
             .render()
             .unwrap(),
@@ -504,6 +559,7 @@ pub async fn register_name(
             return Html(
                 ProfileTemplate {
                     email,
+                    logged_in: false,
                     error: Some("Database error".to_string()),
                 }
                 .render()
@@ -525,6 +581,7 @@ pub async fn register_name(
                             ProfileTemplate {
                                 email,
                                 error: Some("Database error".to_string()),
+                                logged_in: false,
                             }
                             .render()
                             .unwrap(),
@@ -538,6 +595,7 @@ pub async fn register_name(
                     ProfileTemplate {
                         email,
                         error: Some("Database error".to_string()),
+                        logged_in: false,
                     }
                     .render()
                     .unwrap(),
@@ -554,6 +612,7 @@ pub async fn register_name(
                     ProfileTemplate {
                         email,
                         error: Some("Database error".to_string()),
+                        logged_in: false,
                     }
                     .render()
                     .unwrap(),
@@ -582,6 +641,7 @@ pub async fn register_name(
             Html(
                 ProfileTemplate {
                     email,
+                    logged_in: false,
                     error: Some("Database error".to_string()),
                 }
                 .render()

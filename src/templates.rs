@@ -11,12 +11,14 @@ pub struct IndexTemplate {
 #[template(path = "auth/login.html")]
 pub struct LoginTemplate {
     pub error: Option<String>,
+    pub logged_in: bool,
 }
 
 #[derive(Template)]
 #[template(path = "auth/signup.html")]
 pub struct SignupTemplate {
     pub error: Option<String>,
+    pub logged_in: bool,
 }
 
 #[derive(Template)]
@@ -25,6 +27,7 @@ pub struct VerifyTemplate {
     pub email: String,
     pub purpose: String,
     pub error: Option<String>,
+    pub logged_in: bool,
 }
 
 #[derive(Template)]
@@ -32,4 +35,5 @@ pub struct VerifyTemplate {
 pub struct ProfileTemplate {
     pub email: String,
     pub error: Option<String>,
+    pub logged_in: bool,
 }
