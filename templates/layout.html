@@ -797,37 +797,26 @@
                     return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
                 }
 
-                // Fractal Brownian Motion for turbulent clouds
+                // Fractal Brownian Motion - cheaper version (4 octaves)
                 float fbm(vec2 p) {
                     float value = 0.0;
                     float amplitude = 0.5;
-                    float frequency = 1.0;
 
-                    for (int i = 0; i < 5; i++) {
-                        value += amplitude * noise(p * frequency);
+                    for (int i = 0; i < 4; i++) {
+                        value += amplitude * noise(p);
+                        p *= 2.0;
                         amplitude *= 0.5;
-                        frequency *= 2.0;
                     }
 
                     return value;
                 }
 
-                // Turbulent cloud noise - imperceptible internal movement
+                // Turbulent cloud noise - cheaper version (reduced domain warp)
                 float turbulentClouds(vec2 p, float time) {
-                    vec2 q = vec2(0.0);
-
-                    // Domain warping - flowing clouds
-                    q.x = fbm(p + time * 1.0);
-                    q.y = fbm(p + vec2(1.0) + time * 0.75);
-
-                    vec2 r = vec2(0.0);
-                    r.x = fbm(p + q + vec2(1.7, 9.2) + time * 0.5);
-                    r.y = fbm(p + q + vec2(8.3, 2.8) + time * 0.625);
-
-                    // Final turbulence layer
-                    float f = fbm(p + r);
-
-                    return f;
+                    vec2 q;
+                    q.x = fbm(p + vec2(time, 0.0));
+                    q.y = fbm(p + vec2(1.0, time * 0.7));
+                    return fbm(p + q * 0.75);
                 }
 
                 // Lightning flash pattern
@@ -861,17 +850,15 @@
 
                     vec2 cloudPos = centered * 1.5;
 
-                    // Multiple turbulent layers with visible drift
+                    // Two turbulent layers with visible drift
                     float drift1 = time * 0.02;
                     float drift2 = time * 0.012;
-                    float drift3 = time * 0.007;
 
-                    float clouds1 = turbulentClouds(cloudPos * 0.8 + vec2(drift1, 0.0), time);
-                    float clouds2 = turbulentClouds(cloudPos * 1.2 - vec2(drift2, drift2 * 0.2) + vec2(5.2), time * 0.002);
-                    float clouds3 = turbulentClouds(cloudPos * 2.0 + vec2(0.0, drift3) + vec2(10.0), time * 0.00125);
+                    float clouds1 = turbulentClouds(cloudPos * 0.85 + vec2(drift1, 0.0), time);
+                    float clouds2 = turbulentClouds(cloudPos * 1.35 + vec2(4.7, -drift2 * 0.15), time * 0.5);
 
-                    // Combine cloud layers
-                    float cloudDensity = clouds1 * 0.5 + clouds2 * 0.35 + clouds3 * 0.15;
+                    // Combine cloud layers (2 layers instead of 3)
+                    float cloudDensity = clouds1 * 0.65 + clouds2 * 0.35;
 
                     // Sharpen edges for dramatic cloud formations
                     cloudDensity = pow(cloudDensity, 0.7);
@@ -1314,14 +1301,14 @@
                 "boo! 👻",
                 "looking for roommates?",
                 "i used to live here too",
-                "the rent is too high",
+                "are you doing to SF?",
+                "back in london?",
                 "someone left dishes again",
                 "nice fog today ☁️",
                 "spooky season all year",
-                "been haunting since 2024",
+                "been haunting since 2026",
                 "do you believe in ghosts?",
                 "i miss my roommates",
-                "the wifi password is...",
                 "shh, they're sleeping",
             ];
 
