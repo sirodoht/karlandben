@@ -3,14 +3,14 @@
 {% block title %}Profile - karlandben{% endblock %}
 
 {% block content %}
-<div class="hero fade-in" style="padding-top: 4rem;">
-    <div class="section-label fade-in-delay-1">Your identity</div>
-    <h1 class="fade-in">Profile</h1>
-    <div class="fog-divider fade-in-delay-1"></div>
+<div class="hero" style="padding-top: 4rem;">
+    <div class="section-label">Your identity</div>
+    <h1>Profile</h1>
+    <div class="fog-divider"></div>
 </div>
 
 {% if let Some(name) = name %}
-    <div class="fade-in-delay-2" style="margin-bottom: 2rem;">
+    <div style="margin-bottom: 2rem;">
         <p style="margin-bottom: 0.75rem;">
             <span style="color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em;">Name</span><br>
             <span style="color: var(--text-primary); font-size: 1.2rem;">{{ name }}</span>
@@ -21,19 +21,19 @@
         </p>
     </div>
 {% else %}
-    <p class="fade-in-delay-2">Welcome! Let's get you set up. What's your name?</p>
+    <p>Welcome! Let's get you set up. What's your name?</p>
 
     {% if let Some(error) = error %}
-    <div class="error fade-in-delay-2">{{ error }}</div>
+    <div class="error">{{ error }}</div>
     {% endif %}
 
-    <form method="post" action="/profile" class="fade-in-delay-2">
+    <form method="post" action="/profile">
         <input type="text" name="name" required autofocus placeholder="Your name">
         <button type="submit">Continue</button>
     </form>
 {% endif %}
 
-<div class="fade-in-delay-3" style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-subtle);">
+<div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-subtle);">
     <p style="font-size: 0.9rem; color: var(--text-muted);">
         Your profile helps others recognize you when they receive a vouch or connection request.
     </p>
