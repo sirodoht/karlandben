@@ -9,7 +9,6 @@ pub struct EmailForm {
 pub struct VerifyForm {
     pub email: String,
     pub code: String,
-    pub purpose: String,
 }
 
 #[derive(Debug, serde::Deserialize)]

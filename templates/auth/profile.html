@@ -3,9 +3,9 @@
 {% block title %}Complete your profile - fogpub{% endblock %}
 
 {% block content %}
-<h1>Complete your profile</h1>
+<h1>Profile</h1>
 
-<p>Welcome! Please tell us your name.</p>
+<p>Welcome! What's your name?</p>
 
 {% if let Some(error) = error %}
 <div class="error">{{ error }}</div>
@@ -13,8 +13,7 @@
 
 <form method="post" action="/profile">
     <input type="hidden" name="email" value="{{ email }}">
-    <label>Your name</label>
     <input type="text" name="name" required autofocus>
-    <button type="submit">Complete signup</button>
+    <button type="submit">Continue</button>
 </form>
 {% endblock %}

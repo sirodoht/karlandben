@@ -74,20 +74,10 @@ impl EmailService {
         })
     }
 
-    pub async fn send_login_code(&self, to_email: &str, code: &str) -> Result<(), String> {
+    pub async fn send_sign_in_code(&self, to_email: &str, code: &str) -> Result<(), String> {
         let subject = format!("{} is your fogpub sign-in code", code);
         let body = format!(
-            "Your 6-digit login code is: {}\n\nThis code will expire in 15 minutes.",
-            code
-        );
-
-        self.send_email(to_email, &subject, &body).await
-    }
-
-    pub async fn send_signup_code(&self, to_email: &str, code: &str) -> Result<(), String> {
-        let subject = format!("{} is your fogpub signup code", code);
-        let body = format!(
-            "Your 6-digit signup code is: {}\n\nThis code will expire in 15 minutes.",
+            "Your 6-digit sign-in code is: {}\n\nThis code will expire in 15 minutes.",
             code
         );
 

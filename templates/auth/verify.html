@@ -13,9 +13,8 @@
 
 <form method="post" action="/verify">
     <input type="hidden" name="email" value="{{ email }}">
-    <input type="hidden" name="purpose" value="{{ purpose }}">
     <label>6-digit code</label>
-    <input type="text" name="code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required autofocus>
+    <input type="text" name="code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="off" required autofocus>
     <button type="submit">Verify</button>
 </form>
 {% endblock %}

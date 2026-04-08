@@ -6,12 +6,11 @@ CREATE TABLE IF NOT EXISTS users (
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create email_tokens table for login/signup verification
+-- Create email_tokens table for sign-in verification
 CREATE TABLE IF NOT EXISTS email_tokens (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     email TEXT NOT NULL,
     code TEXT NOT NULL,
-    purpose TEXT NOT NULL DEFAULT 'login', -- 'login' or 'signup'
     expires_at DATETIME NOT NULL,
     used_at DATETIME,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,

@@ -31,20 +31,14 @@ pub async fn check_rate_limit(pool: &SqlitePool, email: &str) -> Result<bool, Db
 }
 
 // Create email token
-pub async fn create_token(
-    pool: &SqlitePool,
-    email: &str,
-    code: &str,
-    purpose: &str,
-) -> Result<(), DbError> {
+pub async fn create_token(pool: &SqlitePool, email: &str, code: &str) -> Result<(), DbError> {
     use chrono::{Duration, Utc};
 
     let expires_at = Utc::now() + Duration::minutes(TOKEN_EXPIRY_MINUTES);
 
-    sqlx::query("INSERT INTO email_tokens (email, code, purpose, expires_at) VALUES (?, ?, ?, ?)")
+    sqlx::query("INSERT INTO email_tokens (email, code, expires_at) VALUES (?, ?, ?)")
         .bind(email)
         .bind(code)
-        .bind(purpose)
         .bind(expires_at.naive_utc())
         .execute(pool)
         .await?;
@@ -114,14 +108,15 @@ pub async fn user_exists(pool: &SqlitePool, email: &str) -> Result<bool, DbError
     Ok(result.is_some())
 }
 
-// Check if user needs to set name
+// Check if user needs to set name (returns true if user doesn't exist or has no name)
 pub async fn user_needs_name(pool: &SqlitePool, email: &str) -> Result<bool, DbError> {
     let result: Option<(Option<String>,)> =
         sqlx::query_as("SELECT name FROM users WHERE email = ?")
             .bind(email)
             .fetch_optional(pool)
             .await?;
-    Ok(matches!(result, Some((None,))))
+    // User needs a name if they don't exist (None) or if their name is NULL (Some((None,)))
+    Ok(result.is_none() || matches!(result, Some((None,))))
 }
 
 // Get user by email

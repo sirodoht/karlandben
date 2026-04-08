@@ -4,7 +4,7 @@ use crate::{
     models::{EmailForm, NameForm, VerifyForm},
     services::generate_code,
     session::{self, Session},
-    templates::{IndexTemplate, LoginTemplate, ProfileTemplate, SignupTemplate, VerifyTemplate},
+    templates::{IndexTemplate, LoginTemplate, ProfileTemplate, VerifyTemplate},
 };
 use askama::Template;
 use axum::{
@@ -64,42 +64,6 @@ pub async fn login(
         .into_response();
     }
 
-    // Check if user exists
-    let exists = match database::user_exists(&pool, &email).await {
-        Ok(e) => {
-            if e {
-                debug!("User exists in database");
-            } else {
-                warn!(email = %email, "Login attempt for non-existent user");
-            }
-            e
-        }
-        Err(_) => {
-            error!("Database error checking user existence");
-            return Html(
-                LoginTemplate {
-                    logged_in: false,
-                    error: Some("Database error".to_string()),
-                }
-                .render()
-                .unwrap(),
-            )
-            .into_response();
-        }
-    };
-
-    if !exists {
-        return Html(
-            LoginTemplate {
-                logged_in: false,
-                error: Some("No account found. Please sign up first.".to_string()),
-            }
-            .render()
-            .unwrap(),
-        )
-        .into_response();
-    }
-
     // Check rate limit
     let allowed = match database::check_rate_limit(&pool, &email).await {
         Ok(a) => {
@@ -138,16 +102,16 @@ pub async fn login(
 
     // Create token and send email
     let code = generate_code();
-    match database::create_token(&pool, &email, &code, "login").await {
+    match database::create_token(&pool, &email, &code).await {
         Ok(_) => {
-            info!(email = %email, "Login token created successfully");
+            info!(email = %email, "Sign-in token created successfully");
         }
         Err(e) => {
-            error!(error = ?e, "Failed to create login token");
+            error!(error = ?e, "Failed to create sign-in token");
             return Html(
                 LoginTemplate {
                     logged_in: false,
-                    error: Some("Failed to create login code".to_string()),
+                    error: Some("Failed to create sign-in code".to_string()),
                 }
                 .render()
                 .unwrap(),
@@ -158,10 +122,10 @@ pub async fn login(
 
     // Send email (don't fail if email service is not configured)
     if let Some(service) = email_service {
-        match service.send_login_code(&email, &code).await {
-            Ok(_) => info!(email = %email, "Login code email sent successfully"),
+        match service.send_sign_in_code(&email, &code).await {
+            Ok(_) => info!(email = %email, "Sign-in code email sent successfully"),
             Err(e) => {
-                error!(email = %email, error = %e, "Failed to send login code email");
+                error!(email = %email, error = %e, "Failed to send sign-in code email");
                 return Html(
                     LoginTemplate {
                         logged_in: false,
@@ -177,14 +141,13 @@ pub async fn login(
             }
         }
     } else {
-        info!(email = %email, code = %code, "[DEV] Login code (email not configured)");
+        info!(email = %email, code = %code, "[DEV] Sign-in code (email not configured)");
     }
 
     Html(
         VerifyTemplate {
             logged_in: false,
             email,
-            purpose: "login".to_string(),
             error: None,
         }
         .render()
@@ -193,169 +156,7 @@ pub async fn login(
     .into_response()
 }
 
-pub async fn signup_page() -> impl IntoResponse {
-    Html(
-        SignupTemplate {
-            error: None,
-            logged_in: false,
-        }
-        .render()
-        .unwrap(),
-    )
-}
-
-#[instrument(skip(pool, email_service, form), fields(email))]
-pub async fn signup(
-    Extension(pool): Extension<SqlitePool>,
-    Extension(email_service): Extension<Option<EmailService>>,
-    Form(form): Form<EmailForm>,
-) -> impl IntoResponse {
-    let email = form.email.trim().to_lowercase();
-    tracing::Span::current().record("email", email.as_str());
-
-    info!("Signup attempt initiated");
-
-    // Validate email format
-    if !email.contains('@') {
-        return Html(
-            SignupTemplate {
-                logged_in: false,
-                error: Some("Invalid email address".to_string()),
-            }
-            .render()
-            .unwrap(),
-        )
-        .into_response();
-    }
-
-    // Check if user already exists
-    let exists = match database::user_exists(&pool, &email).await {
-        Ok(e) => {
-            if e {
-                warn!(email = %email, "Signup attempt for existing user");
-            }
-            e
-        }
-        Err(_) => {
-            error!("Database error checking user existence during signup");
-            return Html(
-                SignupTemplate {
-                    logged_in: false,
-                    error: Some("Database error".to_string()),
-                }
-                .render()
-                .unwrap(),
-            )
-            .into_response();
-        }
-    };
-
-    if exists {
-        return Html(
-            SignupTemplate {
-                logged_in: false,
-                error: Some("Account already exists. Please log in.".to_string()),
-            }
-            .render()
-            .unwrap(),
-        )
-        .into_response();
-    }
-
-    // Check rate limit
-    let allowed = match database::check_rate_limit(&pool, &email).await {
-        Ok(a) => {
-            if !a {
-                warn!(email = %email, "Rate limit exceeded for signup");
-            }
-            a
-        }
-        Err(_) => {
-            error!("Database error checking rate limit during signup");
-            return Html(
-                SignupTemplate {
-                    logged_in: false,
-                    error: Some("Database error".to_string()),
-                }
-                .render()
-                .unwrap(),
-            )
-            .into_response();
-        }
-    };
-
-    if !allowed {
-        return Html(
-            SignupTemplate {
-                logged_in: false,
-                error: Some(
-                    "Too many attempts. Please wait before requesting another code.".to_string(),
-                ),
-            }
-            .render()
-            .unwrap(),
-        )
-        .into_response();
-    }
-
-    // Create token and send email
-    let code = generate_code();
-    match database::create_token(&pool, &email, &code, "signup").await {
-        Ok(_) => {
-            info!(email = %email, "Signup token created successfully");
-        }
-        Err(e) => {
-            error!(error = ?e, "Failed to create signup token");
-            return Html(
-                SignupTemplate {
-                    logged_in: false,
-                    error: Some("Failed to create signup code".to_string()),
-                }
-                .render()
-                .unwrap(),
-            )
-            .into_response();
-        }
-    };
-
-    // Send email (don't fail if email service is not configured)
-    if let Some(service) = email_service {
-        match service.send_signup_code(&email, &code).await {
-            Ok(_) => info!(email = %email, "Signup code email sent successfully"),
-            Err(e) => {
-                error!(email = %email, error = %e, "Failed to send signup code email");
-                return Html(
-                    SignupTemplate {
-                        logged_in: false,
-                        error: Some(
-                            "Unable to send verification email. Please try again later."
-                                .to_string(),
-                        ),
-                    }
-                    .render()
-                    .unwrap(),
-                )
-                .into_response();
-            }
-        }
-    } else {
-        info!(email = %email, code = %code, "[DEV] Signup code (email not configured)");
-    }
-
-    Html(
-        VerifyTemplate {
-            logged_in: false,
-            email,
-            purpose: "signup".to_string(),
-            error: None,
-        }
-        .render()
-        .unwrap(),
-    )
-    .into_response()
-}
-
-#[instrument(skip(pool, form), fields(email, purpose))]
+#[instrument(skip(pool, form), fields(email))]
 pub async fn verify(
     Extension(pool): Extension<SqlitePool>,
     Form(form): Form<VerifyForm>,
@@ -363,9 +164,7 @@ pub async fn verify(
     let email = form.email.trim().to_lowercase();
     let code = form.code.trim();
 
-    tracing::Span::current()
-        .record("email", email.as_str())
-        .record("purpose", form.purpose.as_str());
+    tracing::Span::current().record("email", email.as_str());
 
     info!("Verification attempt");
 
@@ -385,7 +184,6 @@ pub async fn verify(
                 VerifyTemplate {
                     logged_in: false,
                     email: email.clone(),
-                    purpose: form.purpose.clone(),
                     error: Some("Database error".to_string()),
                 }
                 .render()
@@ -400,7 +198,6 @@ pub async fn verify(
             VerifyTemplate {
                 logged_in: false,
                 email,
-                purpose: form.purpose,
                 error: Some("Invalid or expired code".to_string()),
             }
             .render()
@@ -409,114 +206,92 @@ pub async fn verify(
         .into_response();
     }
 
-    match form.purpose.as_str() {
-        "signup" => {
-            // For signup, go to name registration page
-            Html(
-                ProfileTemplate {
-                    email,
-                    error: None,
+    // Check if user needs to set name (new user or existing user without name)
+    let needs_name = match database::user_needs_name(&pool, &email).await {
+        Ok(n) => n,
+        Err(_) => {
+            return Html(
+                VerifyTemplate {
                     logged_in: false,
+                    email,
+                    error: Some("Database error".to_string()),
                 }
                 .render()
                 .unwrap(),
             )
-            .into_response()
+            .into_response();
         }
-        "login" => {
-            // For login, check if user needs to set name
-            let needs_name = match database::user_needs_name(&pool, &email).await {
-                Ok(n) => n,
-                Err(_) => {
-                    return Html(
-                        VerifyTemplate {
-                            logged_in: false,
-                            email,
-                            purpose: "login".to_string(),
-                            error: Some("Database error".to_string()),
-                        }
-                        .render()
-                        .unwrap(),
-                    )
-                    .into_response();
-                }
-            };
+    };
 
-            if needs_name {
-                Html(
-                    ProfileTemplate {
-                        email,
-                        error: None,
+    if needs_name {
+        Html(
+            ProfileTemplate {
+                email,
+                error: None,
+                logged_in: false,
+            }
+            .render()
+            .unwrap(),
+        )
+        .into_response()
+    } else {
+        // Complete sign-in - create session
+        let (user_id, _user_name) = match database::get_user_by_email(&pool, &email).await {
+            Ok(Some((id, name))) => (id, name),
+            Ok(None) => {
+                return Html(
+                    VerifyTemplate {
                         logged_in: false,
+                        email: email.clone(),
+                        error: Some("Database error".to_string()),
+                    }
+                    .render()
+                    .unwrap(),
+                )
+                .into_response();
+            }
+            Err(_) => {
+                return Html(
+                    VerifyTemplate {
+                        logged_in: false,
+                        email: email.clone(),
+                        error: Some("Database error".to_string()),
+                    }
+                    .render()
+                    .unwrap(),
+                )
+                .into_response();
+            }
+        };
+
+        // Create session
+        let token = session::generate_session_token();
+        let max_age_days = session::SESSION_MAX_AGE_DAYS;
+        match database::create_session(&pool, user_id, &token, max_age_days).await {
+            Ok(_) => {
+                info!(user_id, email = %email, "User signed in successfully");
+
+                // Build response with session cookie
+                let mut response = Redirect::to("/").into_response();
+                if let Some(cookie) = session::build_session_cookie(&token) {
+                    response.headers_mut().insert(header::SET_COOKIE, cookie);
+                }
+                response
+            }
+            Err(e) => {
+                error!(error = ?e, "Failed to create session");
+                Html(
+                    VerifyTemplate {
+                        logged_in: false,
+                        email: email.clone(),
+                        error: Some("Database error".to_string()),
                     }
                     .render()
                     .unwrap(),
                 )
                 .into_response()
-            } else {
-                // Complete login - create session
-                let (user_id, _user_name) = match database::get_user_by_email(&pool, &email).await {
-                    Ok(Some((id, name))) => (id, name),
-                    Ok(None) => {
-                        return Html(
-                            VerifyTemplate {
-                                logged_in: false,
-                                email: email.clone(),
-                                purpose: "login".to_string(),
-                                error: Some("Database error".to_string()),
-                            }
-                            .render()
-                            .unwrap(),
-                        )
-                        .into_response();
-                    }
-                    Err(_) => {
-                        return Html(
-                            VerifyTemplate {
-                                logged_in: false,
-                                email: email.clone(),
-                                purpose: "login".to_string(),
-                                error: Some("Database error".to_string()),
-                            }
-                            .render()
-                            .unwrap(),
-                        )
-                        .into_response();
-                    }
-                };
-
-                // Create session
-                let token = session::generate_session_token();
-                let max_age_days = session::SESSION_MAX_AGE_DAYS;
-                match database::create_session(&pool, user_id, &token, max_age_days).await {
-                    Ok(_) => {
-                        info!(user_id, email = %email, "User logged in successfully");
-
-                        // Build response with session cookie
-                        let mut response = Redirect::to("/").into_response();
-                        if let Some(cookie) = session::build_session_cookie(&token) {
-                            response.headers_mut().insert(header::SET_COOKIE, cookie);
-                        }
-                        response
-                    }
-                    Err(e) => {
-                        error!(error = ?e, "Failed to create session");
-                        Html(
-                            VerifyTemplate {
-                                logged_in: false,
-                                email: email.clone(),
-                                purpose: "login".to_string(),
-                                error: Some("Database error".to_string()),
-                            }
-                            .render()
-                            .unwrap(),
-                        )
-                        .into_response()
-                    }
-                }
             }
         }
-        _ => Redirect::to("/").into_response(),
     }
 }
 

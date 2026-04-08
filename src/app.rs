@@ -10,7 +10,6 @@ pub fn create_app(pool: SqlitePool, email_service: Option<EmailService>) -> Rout
         .route("/", get(handlers::index))
         // Auth routes
         .route("/login", get(handlers::login_page).post(handlers::login))
-        .route("/signup", get(handlers::signup_page).post(handlers::signup))
         .route("/verify", post(handlers::verify))
         .route("/profile", post(handlers::register_name))
         .route("/logout", post(handlers::logout))
