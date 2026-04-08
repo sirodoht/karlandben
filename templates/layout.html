@@ -824,22 +824,11 @@
 
                 // Lightning flash pattern
                 float lightning(float time, vec2 uv) {
-                    // Create occasional flash events
-                    float flashInterval = 8.0;
-                    float flashPhase = mod(time * 0.125, flashInterval);
-
-                    // Build up energy then release
-                    float energy = smoothstep(0.0, 100.0, flashPhase) * smoothstep(120.0, 115.0, flashPhase);
-
-                    // Random flash pattern
-                    float flashNoise = hash(uv * 10.0 + floor(time * 0.125));
-                    float flash = step(0.992, flashNoise) * energy;
-
-                    // Multiple flickers within the main flash
-                    float flicker = sin(time * 5.0) * 0.5 + 0.5;
-                    flash *= flicker;
-
-                    return flash;
+                    float cycle = mod(time, 12.0);
+                    float burst = smoothstep(0.2, 0.0, abs(cycle - 0.35));
+                    float mask = step(0.996, hash(floor(uv * 12.0) + floor(time * 2.0)));
+                    float flicker = 0.6 + 0.4 * sin(time * 40.0);
+                    return burst * mask * flicker;
                 }
 
                 void main() {
@@ -884,7 +873,8 @@
                     nebulaColor = mix(nebulaColor, cyanGlow, cyanMask * 0.4);
 
                     // Cosmic energy bursts
-                    float flash = lightning(u_time, uv);
+                    float timeSeconds = u_time * 0.001;
+                    float flash = lightning(timeSeconds, uv);
                     vec3 energyColor = vec3(0.7, 0.9, 1.0) * flash * 0.6;
 
                     // Add energy bursts to nebula
