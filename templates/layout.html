@@ -968,26 +968,42 @@
 
             // Animation state
             let startTime = performance.now();
-            let isVisible = true;
-            let animationId;
+            let animationId = null;
+            let running = false;
             let frameCount = 0;
             let lastFrameTime = 0;
             const targetFPS = 30; // Cap at 30fps instead of 60
             const frameInterval = 1000 / targetFPS;
 
-            // Visibility handling - pause when hidden
+            function start() {
+                if (!running && !document.hidden && !prefersReducedMotion) {
+                    running = true;
+                    animationId = requestAnimationFrame(render);
+                }
+            }
+
+            function stop() {
+                running = false;
+                if (animationId !== null) {
+                    cancelAnimationFrame(animationId);
+                    animationId = null;
+                }
+            }
+
+            // Visibility handling - properly start/stop the loop
             document.addEventListener('visibilitychange', () => {
-                isVisible = !document.hidden;
-                if (isVisible) {
-                    startTime = performance.now() - (frameCount * 33.33); // Maintain time continuity
+                if (document.hidden) {
+                    stop();
+                } else {
+                    startTime = performance.now() - (frameCount * frameInterval);
+                    start();
                 }
             });
 
             // Render loop with frame capping
             function render(currentTime) {
+                if (!running) return;
                 animationId = requestAnimationFrame(render);
-
-                if (!isVisible || prefersReducedMotion) return;
 
                 // Frame capping - skip frames to hit target FPS
                 const elapsed = currentTime - lastFrameTime;
@@ -1017,7 +1033,8 @@
                 gl.drawArrays(gl.TRIANGLES, 0, 6);
             }
 
-            render(performance.now());
+            // Start the loop
+            if (!prefersReducedMotion) start();
         })();
 
         // Constellation Drawing
@@ -1052,13 +1069,28 @@
             let mouseX = -1000;
             let mouseY = -1000;
             let activeConnections = new Map(); // star index -> opacity
-            let animationId;
-            let isVisible = true;
+            let animationId = null;
+            let running = false;
 
             // Shooting stars
             let shootingStars = [];
             let lastShootingStarTime = 0;
             let nextShootingStarDelay = 5000 + Math.random() * 15000; // 5-20s
+
+            function start() {
+                if (!running && !document.hidden) {
+                    running = true;
+                    animationId = requestAnimationFrame(drawConstellation);
+                }
+            }
+
+            function stop() {
+                running = false;
+                if (animationId !== null) {
+                    cancelAnimationFrame(animationId);
+                    animationId = null;
+                }
+            }
 
             function spawnShootingStar() {
                 // Random starting edge: 0=top, 1=right, 2=left (avoid bottom)
@@ -1113,9 +1145,13 @@
                 mouseY = e.clientY;
             }, { passive: true });
 
-            // Check visibility
+            // Check visibility - properly start/stop the loop
             document.addEventListener('visibilitychange', () => {
-                isVisible = !document.hidden;
+                if (document.hidden) {
+                    stop();
+                } else {
+                    start();
+                }
             });
 
             function getDistance(x1, y1, x2, y2) {
@@ -1123,10 +1159,8 @@
             }
 
             function drawConstellation() {
-                if (!isVisible) {
-                    animationId = requestAnimationFrame(drawConstellation);
-                    return;
-                }
+                if (!running) return;
+                animationId = requestAnimationFrame(drawConstellation);
 
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -1288,11 +1322,10 @@
 
                 ctx.globalAlpha = 1;
                 ctx.shadowBlur = 0;
-
-                animationId = requestAnimationFrame(drawConstellation);
             }
 
-            drawConstellation();
+            // Start the loop
+            start();
         })();
 
         // Friendly Ghost Interactions
