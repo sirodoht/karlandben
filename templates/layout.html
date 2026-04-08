@@ -4,86 +4,209 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}fogpub{% endblock %}</title>
-    <link href="https://fonts.bunny.net/css2?family=Playfair+Display:wght@400;500;600&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.bunny.net/css2?family=Cormorant+Garamond:wght@400;500;600&family=Sora:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #faf8f5;
-            --bg-warm: #f5f0e8;
-            --text: #2c2420;
-            --muted: #6b5d54;
-            --accent: #c4754e;
-            --accent-hover: #a8623d;
-            --nav: #2c2420;
-            --card: #fff;
-            --border: #e8e0d5;
-            --display: 'Playfair Display', Georgia, serif;
-            --body: 'Source Sans 3', system-ui, sans-serif;
+            /* Moody atmospheric fog palette */
+            --bg-deep: #050608;
+            --bg-mid: #0a0c0f;
+            --bg-light: #111318;
+            --fog-1: rgba(130, 150, 175, 0.08);
+            --fog-2: rgba(90, 110, 135, 0.04);
+            --fog-3: rgba(60, 80, 105, 0.06);
+            --text-primary: #e8eef5;
+            --text-secondary: #6b7a8d;
+            --text-muted: #4a5568;
+            --accent-moonlight: #a8aeb8;
+            --accent-glow: rgba(168, 174, 184, 0.35);
+            --border-subtle: rgba(100, 120, 140, 0.08);
+            --card-bg: rgba(10, 12, 15, 0.85);
+            
+            --display: 'Cormorant Garamond', Georgia, serif;
+            --body: 'Sora', system-ui, sans-serif;
         }
 
         body {
             margin: 0;
-            font: 1.05rem/1.7 var(--body);
-            color: var(--text);
-            background: var(--bg);
+            font: 300 1rem/1.8 var(--body);
+            color: var(--text-primary);
+            background: var(--bg-deep);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            position: relative;
+            overflow-x: hidden;
         }
 
+        /* WebGL fog canvas */
+        #fog-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Atmospheric gradient overlay */
+        .atmosphere {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            background:
+                radial-gradient(ellipse at 20% 80%, var(--fog-1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, var(--fog-2) 0%, transparent 40%),
+                radial-gradient(ellipse at 50% 50%, var(--fog-3) 0%, transparent 60%);
+            animation: atmosphereShift 18s ease-in-out infinite;
+        }
+
+        @keyframes atmosphereShift {
+            0%, 100% {
+                opacity: 0.5;
+                transform: translateX(0) scale(1);
+            }
+            50% {
+                opacity: 0.7;
+                transform: translateX(-2%) scale(1.02);
+            }
+        }
+
+        /* Vignette overlay */
+        .vignette {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+            background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.6) 100%);
+        }
+
+        /* Film grain overlay */
+        .grain {
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            pointer-events: none;
+            z-index: 3;
+            opacity: 0.035;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            animation: grainShift 8s steps(10) infinite;
+        }
+
+        @keyframes grainShift {
+            0%, 100% { transform: translate(0, 0); }
+            10% { transform: translate(-2%, -2%); }
+            20% { transform: translate(2%, -1%); }
+            30% { transform: translate(-1%, 2%); }
+            40% { transform: translate(1%, 1%); }
+            50% { transform: translate(-2%, 2%); }
+            60% { transform: translate(2%, 0%); }
+            70% { transform: translate(0%, -2%); }
+            80% { transform: translate(-1%, 1%); }
+            90% { transform: translate(1%, -1%); }
+        }
+
+        /* Navigation */
         nav {
-            background: var(--nav);
+            position: relative;
+            z-index: 10;
             padding: 0 2rem;
+            border-bottom: 1px solid var(--border-subtle);
+            background: linear-gradient(to bottom, var(--bg-deep) 0%, transparent 100%);
         }
 
         nav .nav-content {
-            max-width: 720px;
+            max-width: 900px;
             margin: 0 auto;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            height: 64px;
+            height: 72px;
         }
 
         nav .brand {
-            color: var(--bg);
-            font: 500 1.4rem var(--display);
-            letter-spacing: -0.01em;
+            color: var(--text-primary);
+            font: 500 1.6rem var(--display);
+            letter-spacing: 0.02em;
+            text-decoration: none;
+            position: relative;
         }
-        nav .brand:hover { opacity: 0.85; text-decoration: none; }
+
+        nav .brand::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--accent-moonlight);
+        }
+        nav .brand:hover {
+            text-decoration: none;
+            color: var(--accent-moonlight);
+        }
 
         nav .nav-links {
             display: flex;
-            gap: 1.75rem;
+            gap: 2rem;
             align-items: center;
         }
 
         nav .nav-links a, nav button {
-            color: #b8a99a;
-            font-size: 0.95rem;
-            font-weight: 500;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 400;
             text-decoration: none;
             background: none;
             border: none;
             padding: 0;
             cursor: pointer;
             font-family: inherit;
+            transition: color 0.3s ease;
+            position: relative;
         }
 
-        nav .nav-links a:hover, nav button:hover { color: var(--bg); }
+        nav .nav-links a::after, nav button::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--accent-moonlight);
+        }
+        nav .nav-links a:hover, nav button:hover {
+            color: var(--text-primary);
+        }
 
+        /* Main content */
         main {
             flex: 1;
-            max-width: 720px;
+            max-width: 900px;
             width: 100%;
             margin: 0 auto;
+            padding: 0 1.5rem;
+            position: relative;
+            z-index: 5;
         }
 
         h1 {
             font-family: var(--display);
-            font-weight: 500;
-            line-height: 1.3;
-            font-size: 2.6rem;
-            margin: 1rem 0;
+            font-weight: 400;
+            line-height: 1.2;
+            font-size: 3.2rem;
+            margin: 0 0 1.5rem;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
         }
 
         h2 {
@@ -91,141 +214,268 @@
             font-weight: 500;
             line-height: 1.3;
             margin: 0 0 1rem;
-            font-size: 1.9rem;
+            font-size: 2rem;
+            color: var(--text-primary);
         }
 
         h3 {
             font-family: var(--display);
             font-weight: 500;
             line-height: 1.3;
-            margin: 0 0 1rem;
-            font-size: 1.3rem;
-            margin-bottom: 0.75rem;
+            margin: 0 0 0.75rem;
+            font-size: 1.4rem;
+            color: var(--text-primary);
         }
 
-
         p {
-            margin: 0 0 1.25rem;
-            color: var(--muted);
+            margin: 0 0 1.5rem;
+            color: var(--text-secondary);
+            font-weight: 300;
         }
 
         a {
-            color: var(--accent);
+            color: var(--accent-moonlight);
             text-decoration: none;
+            transition: all 0.3s ease;
         }
 
         a:hover {
-            color: var(--accent-hover);
-            text-decoration: underline;
+            color: #c9d0da;
+            text-shadow: 0 0 25px var(--accent-glow);
         }
 
+        /* Buttons */
         button, .button {
-            background: var(--accent);
-            color: #fff;
-            border: none;
-            padding: 0.85rem 2rem;
-            font: inherit;
-            font-weight: 500;
+            background: transparent;
+            color: var(--accent-moonlight);
+            border: 1px solid var(--accent-moonlight);
+            padding: 0.9rem 2rem;
+            font: 400 0.95rem var(--body);
             cursor: pointer;
-            border-radius: 6px;
             text-decoration: none;
             display: inline-block;
+            transition: all 0.4s ease;
+            letter-spacing: 0.02em;
         }
 
         button:hover, .button:hover {
-            background: var(--accent-hover);
-            color: #fff;
+            color: var(--accent-moonlight);
             text-decoration: none;
+            box-shadow: 0 0 30px var(--accent-glow);
+            background: rgba(168, 174, 184, 0.08);
         }
 
+        /* Forms */
         form { max-width: 420px; }
 
         label {
             display: block;
             margin-bottom: 0.5rem;
-            font-weight: 600;
+            font-weight: 400;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            letter-spacing: 0.02em;
         }
 
         input[type="text"],
         input[type="email"],
         input[type="password"] {
             width: 100%;
-            padding: 0.85rem;
-            border: 1.5px solid var(--border);
-            border-radius: 6px;
-            font: inherit;
-            margin-bottom: 1.25rem;
-            background: var(--card);
+            padding: 1rem;
+            border: 1px solid var(--border-subtle);
+            font: 300 1rem var(--body);
+            margin-bottom: 1.5rem;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
         }
 
         input:focus {
             outline: none;
-            border-color: var(--accent);
+            border-color: var(--accent-moonlight);
+            box-shadow: 0 0 20px rgba(168, 174, 184, 0.12);
         }
 
+        input::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* Error messages */
         .error {
-            background: #fdf2f0;
-            color: #b91c1c;
-            padding: 0.85rem 1.25rem;
-            border-radius: 6px;
-            margin-bottom: 1.25rem;
-            border-left: 3px solid #b91c1c;
+            background: rgba(239, 68, 68, 0.1);
+            color: #fca5a5;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            border-left: 2px solid #ef4444;
+            font-size: 0.95rem;
         }
 
-        /* Landing page */
-        .hero { padding: 3rem 0 2rem; }
-        .hero h1 { font-size: 3rem; letter-spacing: -0.02em; }
+        /* Landing page styles */
+        .hero {
+            padding: 5rem 0 3rem;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: 3.8rem;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
 
         .hero-subtitle {
-            font-size: 1.25rem;
-            color: var(--muted);
-            max-width: 540px;
-            line-height: 1.6;
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            max-width: 560px;
+            line-height: 1.8;
+            margin-bottom: 2rem;
+            font-weight: 300;
         }
 
         .section-alt {
-            background: var(--bg-warm);
-            padding: 2.5rem 2rem;
+            padding: 3rem 0;
+            position: relative;
+        }
+
+        .section-alt::before {
+            content: '';
+            position: absolute;
+            left: -50vw;
+            right: -50vw;
+            top: 0;
+            bottom: 0;
+            background: var(--fog-1);
+            z-index: -1;
         }
 
         .use-cases {
             display: grid;
             gap: 1.5rem;
-            margin-top: 1.5rem;
+            margin-top: 2rem;
         }
 
         .use-case {
-            background: var(--card);
-            padding: 1.75rem;
-            border-radius: 10px;
-            border: 1px solid var(--border);
+            background: var(--card-bg);
+            padding: 2rem;
+            border: 1px solid var(--border-subtle);
+            backdrop-filter: blur(10px);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .use-case::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-moonlight), transparent);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .use-case:hover {
+            border-color: rgba(168, 174, 184, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .use-case:hover::before {
+            opacity: 1;
         }
 
         .use-case p {
             margin: 0;
             font-style: italic;
+            color: var(--text-secondary);
         }
 
         .cta-section {
             text-align: center;
-            padding: 3rem 0;
+            padding: 4rem 0;
+        }
+
+        .cta-section p {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 2rem;
         }
 
         .cta-section .button {
-            font-size: 1.15rem;
-            padding: 1rem 2.5rem;
+            font-size: 1.05rem;
+            padding: 1.1rem 2.8rem;
         }
 
-        .divider {
-            width: 120px;
-            height: 3px;
-            background: var(--accent);
-            border-radius: 2px;
-            margin: 12px 0;
+        /* Decorative elements */
+        .fog-divider {
+            width: 80px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-moonlight), transparent);
+            margin: 1.5rem 0;
+            opacity: 0.6;
+        }
+
+        .section-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--accent-moonlight);
+            margin-bottom: 1rem;
+        }
+
+        /* Page entrance animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(25px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            opacity: 0;
+        }
+
+        .fade-in-delay-1 { animation-delay: 0.1s; }
+        .fade-in-delay-2 { animation-delay: 0.2s; }
+        .fade-in-delay-3 { animation-delay: 0.3s; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 { font-size: 2.4rem; }
+            .hero h1 { font-size: 2.8rem; }
+            nav { padding: 0 1rem; }
+            main { padding: 0 1rem; }
+        }
+
+        /* Reduce motion preference */
+        @media (prefers-reduced-motion: reduce) {
+            .atmosphere, .grain {
+                animation: none;
+            }
+            .fade-in {
+                animation: none;
+                opacity: 1;
+            }
         }
     </style>
 </head>
 <body>
+    <canvas id="fog-canvas"></canvas>
+    <div class="atmosphere"></div>
+    <div class="vignette"></div>
+    <div class="grain"></div>
+
     <nav>
         <div class="nav-content">
             <a href="/" class="brand">fogpub</a>
@@ -249,5 +499,272 @@
         {% block content %}
         {% endblock %}
     </main>
+
+    <script>
+        // WebGL Fog Effect
+        (function() {
+            const canvas = document.getElementById('fog-canvas');
+            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+
+            if (!gl) {
+                console.log('WebGL not supported, falling back to CSS effects');
+                return;
+            }
+
+            // Check for reduced motion preference
+            const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const particleCount = prefersReducedMotion ? 20 : 50;
+
+            // Resize canvas
+            function resize() {
+                const dpr = Math.min(window.devicePixelRatio || 1, 2);
+                canvas.width = window.innerWidth * dpr;
+                canvas.height = window.innerHeight * dpr;
+                gl.viewport(0, 0, canvas.width, canvas.height);
+            }
+            resize();
+            window.addEventListener('resize', resize, { passive: true });
+
+            // Vertex shader for fog particles
+            const vsSource = `
+                attribute vec2 a_position;
+                attribute float a_size;
+                attribute float a_opacity;
+
+                uniform vec2 u_resolution;
+                uniform float u_time;
+                uniform vec2 u_mouse;
+
+                varying float v_opacity;
+                varying vec2 v_center;
+
+                void main() {
+                    v_opacity = a_opacity;
+
+                    // Parallax effect based on mouse
+                    float parallaxX = u_mouse.x * 0.1;
+                    float parallaxY = u_mouse.y * 0.1;
+
+                    // Subtle movement over time
+                    float time = u_time * 0.0015;
+                    float moveX = sin(time + a_position.x * 3.0) * 0.02;
+                    float moveY = cos(time + a_position.y * 2.0) * 0.015;
+
+                    vec2 position = a_position;
+                    position.x += parallaxX + moveX;
+                    position.y += parallaxY + moveY;
+
+                    // Convert to clip space
+                    vec2 clipSpace = ((position / u_resolution) * 2.0) - 1.0;
+                    clipSpace.y = -clipSpace.y;
+
+                    gl_Position = vec4(clipSpace, 0.0, 1.0);
+                    gl_PointSize = a_size;
+
+                    v_center = clipSpace;
+                }
+            `;
+
+            // Fragment shader for soft fog particles
+            const fsSource = `
+                precision mediump float;
+
+                varying float v_opacity;
+                varying vec2 v_center;
+
+                uniform vec3 u_color;
+
+                void main() {
+                    // Calculate distance from center of point
+                    vec2 coord = gl_PointCoord - vec2(0.5);
+                    float dist = length(coord);
+
+                    // Soft radial falloff
+                    float alpha = smoothstep(0.5, 0.0, dist);
+
+                    // Add some noise-like variation
+                    float noise = sin(gl_FragCoord.x * 0.1) * sin(gl_FragCoord.y * 0.1) * 0.1 + 0.9;
+
+                    gl_FragColor = vec4(u_color, v_opacity * alpha * noise * 0.6);
+                }
+            `;
+
+            // Compile shader
+            function compileShader(type, source) {
+                const shader = gl.createShader(type);
+                gl.shaderSource(shader, source);
+                gl.compileShader(shader);
+
+                if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                    console.error('Shader compile error:', gl.getShaderInfoLog(shader));
+                    gl.deleteShader(shader);
+                    return null;
+                }
+                return shader;
+            }
+
+            // Create shader program
+            function createProgram(vsSource, fsSource) {
+                const vertexShader = compileShader(gl.VERTEX_SHADER, vsSource);
+                const fragmentShader = compileShader(gl.FRAGMENT_SHADER, fsSource);
+
+                const program = gl.createProgram();
+                gl.attachShader(program, vertexShader);
+                gl.attachShader(program, fragmentShader);
+                gl.linkProgram(program);
+
+                if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+                    console.error('Program link error:', gl.getProgramInfoLog(program));
+                    return null;
+                }
+                return program;
+            }
+
+            const program = createProgram(vsSource, fsSource);
+
+            // Get attribute and uniform locations
+            const a_position = gl.getAttribLocation(program, 'a_position');
+            const a_size = gl.getAttribLocation(program, 'a_size');
+            const a_opacity = gl.getAttribLocation(program, 'a_opacity');
+            const u_resolution = gl.getUniformLocation(program, 'u_resolution');
+            const u_time = gl.getUniformLocation(program, 'u_time');
+            const u_mouse = gl.getUniformLocation(program, 'u_mouse');
+            const u_color = gl.getUniformLocation(program, 'u_color');
+
+            // Generate fog particle data
+            const positions = new Float32Array(particleCount * 2);
+            const sizes = new Float32Array(particleCount);
+            const opacities = new Float32Array(particleCount);
+            const velocities = [];
+
+            for (let i = 0; i < particleCount; i++) {
+                // Random position across screen
+                positions[i * 2] = Math.random() * canvas.width;
+                positions[i * 2 + 1] = Math.random() * canvas.height;
+
+                // Random size (large for fog effect)
+                sizes[i] = Math.random() * 300 + 150;
+
+                // Random opacity (more subtle and mysterious)
+                opacities[i] = Math.random() * 0.2 + 0.05;
+
+                // Velocity for drifting (slower, more moody)
+                velocities.push({
+                    x: (Math.random() - 0.5) * 0.25,
+                    y: (Math.random() - 0.5) * 0.18
+                });
+            }
+
+            // Create buffers
+            const positionBuffer = gl.createBuffer();
+            const sizeBuffer = gl.createBuffer();
+            const opacityBuffer = gl.createBuffer();
+
+            // Mouse tracking
+            let mouseX = 0;
+            let mouseY = 0;
+            let targetMouseX = 0;
+            let targetMouseY = 0;
+
+            document.addEventListener('mousemove', (e) => {
+                targetMouseX = (e.clientX / window.innerWidth) * 2 - 1;
+                targetMouseY = -((e.clientY / window.innerHeight) * 2 - 1);
+            }, { passive: true });
+
+            // Enable blending for transparency
+            gl.enable(gl.BLEND);
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+            // Animation state
+            let startTime = performance.now();
+            let isVisible = true;
+            let animationId;
+
+            // Visibility handling
+            document.addEventListener('visibilitychange', () => {
+                isVisible = !document.hidden;
+            });
+
+            // Render loop
+            function render() {
+                if (!isVisible) {
+                    animationId = requestAnimationFrame(render);
+                    return;
+                }
+
+                const currentTime = performance.now();
+                const elapsed = currentTime - startTime;
+
+                // Smooth mouse interpolation
+                mouseX += (targetMouseX - mouseX) * 0.12;
+                mouseY += (targetMouseY - mouseY) * 0.12;
+
+                // Update particle positions
+                for (let i = 0; i < particleCount; i++) {
+                    positions[i * 2] += velocities[i].x;
+                    positions[i * 2 + 1] += velocities[i].y;
+
+                    // Wrap around screen
+                    if (positions[i * 2] > canvas.width + 200) {
+                        positions[i * 2] = -200;
+                        positions[i * 2 + 1] = Math.random() * canvas.height;
+                    }
+                    if (positions[i * 2] < -200) {
+                        positions[i * 2] = canvas.width + 200;
+                    }
+                    if (positions[i * 2 + 1] > canvas.height + 200) {
+                        positions[i * 2 + 1] = -200;
+                        positions[i * 2] = Math.random() * canvas.width;
+                    }
+                    if (positions[i * 2 + 1] < -200) {
+                        positions[i * 2 + 1] = canvas.height + 200;
+                    }
+                }
+
+                // Clear with transparent background
+                gl.clearColor(0.0, 0.0, 0.0, 0.0);
+                gl.clear(gl.COLOR_BUFFER_BIT);
+
+                // Use program
+                gl.useProgram(program);
+
+                // Update position buffer
+                gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, positions, gl.DYNAMIC_DRAW);
+                gl.enableVertexAttribArray(a_position);
+                gl.vertexAttribPointer(a_position, 2, gl.FLOAT, false, 0, 0);
+
+                // Update size buffer
+                gl.bindBuffer(gl.ARRAY_BUFFER, sizeBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, sizes, gl.STATIC_DRAW);
+                gl.enableVertexAttribArray(a_size);
+                gl.vertexAttribPointer(a_size, 1, gl.FLOAT, false, 0, 0);
+
+                // Update opacity buffer
+                gl.bindBuffer(gl.ARRAY_BUFFER, opacityBuffer);
+                gl.bufferData(gl.ARRAY_BUFFER, opacities, gl.STATIC_DRAW);
+                gl.enableVertexAttribArray(a_opacity);
+                gl.vertexAttribPointer(a_opacity, 1, gl.FLOAT, false, 0, 0);
+
+                // Set uniforms
+                gl.uniform2f(u_resolution, canvas.width, canvas.height);
+                gl.uniform1f(u_time, elapsed);
+                gl.uniform2f(u_mouse, mouseX, mouseY);
+
+                // Draw in multiple passes for depth
+                // First pass: deeper fog (dark, mysterious)
+                gl.uniform3f(u_color, 0.25, 0.32, 0.42); // Deep blue-grey
+                gl.drawArrays(gl.POINTS, 0, Math.floor(particleCount / 2));
+                
+                // Second pass: closer fog (slightly warmer, but still moody)
+                gl.uniform3f(u_color, 0.38, 0.44, 0.52); // Muted grey
+                gl.drawArrays(gl.POINTS, Math.floor(particleCount / 2), Math.ceil(particleCount / 2));
+
+                animationId = requestAnimationFrame(render);
+            }
+
+            render();
+        })();
+    </script>
 </body>
 </html>

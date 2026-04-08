@@ -3,18 +3,28 @@
 {% block title %}Verify - fogpub{% endblock %}
 
 {% block content %}
-<h1>Enter verification code</h1>
+<div class="hero fade-in" style="padding-top: 4rem;">
+    <div class="section-label fade-in-delay-1">Security check</div>
+    <h1 class="fade-in">Enter verification code</h1>
+    <div class="fog-divider fade-in-delay-1"></div>
+</div>
 
-<p>We've sent a 6-digit code to {{ form_email }}.</p>
+<p class="fade-in-delay-2">
+    We've sent a 6-digit code to <strong style="color: var(--text-primary);">{{ form_email }}</strong>
+</p>
 
 {% if let Some(error) = error %}
-<div class="error">{{ error }}</div>
+<div class="error fade-in-delay-2">{{ error }}</div>
 {% endif %}
 
-<form method="post" action="/verify">
+<form method="post" action="/verify" class="fade-in-delay-2">
     <input type="hidden" name="email" value="{{ form_email }}">
     <label>6-digit code</label>
-    <input type="text" name="code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="off" required autofocus>
+    <input type="text" name="code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="off" required autofocus placeholder="000000">
     <button type="submit">Verify</button>
 </form>
+
+<p class="fade-in-delay-3" style="margin-top: 2rem; font-size: 0.9rem; color: var(--text-muted);">
+    Didn't receive it? <a href="/login">Request a new code</a>
+</p>
 {% endblock %}

@@ -4,25 +4,34 @@
 
 {% block content %}
 {% if logged_in %}
-    {% if let Some(name) = name %}
-        <h1>Welcome back, {{ name }}!</h1>
-    {% else %}
-        <h1>Welcome back!</h1>
-    {% endif %}
+    <div class="hero">
+        {% if let Some(name) = name %}
+            <h1>Welcome back, {{ name }}</h1>
+        {% else %}
+            <h1>Welcome back</h1>
+        {% endif %}
+        <div class="fog-divider"></div>
+        <p class="hero-subtitle">
+            You're part of a community built on trust and shared experiences.
+        </p>
+    </div>
 {% else %}
     <div class="hero">
         <h1>Vouch for the people<br>you've lived with</h1>
-        <div class="divider"></div>
+        <div class="fog-divider"></div>
         <p class="hero-subtitle">
             Fogpub is a simple social network that allows people to vouch for friends or acquaintances
             they have lived in the same house, whether that was for a few days or multiple years.
         </p>
-        <a href="/login" class="button">Get started</a>
+        <div>
+            <a href="/login" class="button">Get started</a>
+        </div>
     </div>
 
     <div class="section-alt">
-        <h2>Why?</h2>
-        <div class="divider"></div>
+        <div class="section-label">Why fogpub?</div>
+        <h2>The question we keep asking</h2>
+        <div class="fog-divider"></div>
         <p>
             Lots of our friends move between London and San Francisco. We want to help them and we want to host them.
             Inviting someone you don't know can be risky. We want a simple way to ask:
@@ -45,10 +54,9 @@
     </div>
 
     <div class="cta-section">
-        <p style="font-size: 1.1rem; color: var(--color-text);">
-            Build trust through the people you've shared a home with.
-        </p>
-        <a href="/login" class="button">Join Fogpub</a>
+        <div>
+            <a href="/login" class="button">Get started</a>
+        </div>
     </div>
 {% endif %}
 {% endblock %}
