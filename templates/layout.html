@@ -976,14 +976,16 @@
             function start() {
                 if (!running && !document.hidden && !prefersReducedMotion) {
                     running = true;
-                    animationId = requestAnimationFrame(render);
+                    lastFrameTime = performance.now();
+                    // Use setTimeout for true 30fps scheduling, not RAF
+                    animationId = setTimeout(render, 0);
                 }
             }
 
             function stop() {
                 running = false;
                 if (animationId !== null) {
-                    cancelAnimationFrame(animationId);
+                    clearTimeout(animationId);
                     animationId = null;
                 }
             }
@@ -998,18 +1000,18 @@
                 }
             });
 
-            // Render loop with frame capping
-            function render(currentTime) {
+            // Render loop with true 30fps using setTimeout
+            // This wakes the main thread only 30 times/sec, not at display refresh rate
+            function render() {
                 if (!running) return;
-                animationId = requestAnimationFrame(render);
 
-                // Frame capping - skip frames to hit target FPS
-                const elapsed = currentTime - lastFrameTime;
-                if (elapsed < frameInterval) return;
-                lastFrameTime = currentTime - (elapsed % frameInterval);
-
+                const currentTime = performance.now();
                 const timeSinceStart = currentTime - startTime;
                 frameCount++;
+
+                // Schedule next frame at 33.33ms (30fps) - main thread sleeps between
+                animationId = setTimeout(render, frameInterval);
+                lastFrameTime = currentTime;
 
                 gl.clear(gl.COLOR_BUFFER_BIT);
                 gl.uniform2f(u_resolution, canvas.width, canvas.height);
