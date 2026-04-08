@@ -3,21 +3,20 @@
 {% block title %}Profile - karlandben{% endblock %}
 
 {% block content %}
-<div class="hero" style="padding-top: 4rem;">
-    <div class="section-label">Your identity</div>
+<div class="hero hero-compact">
     <h1>Profile</h1>
     <div class="fog-divider"></div>
 </div>
 
 {% if let Some(name) = name %}
-    <div style="margin-bottom: 2rem;">
-        <p style="margin-bottom: 0.75rem;">
-            <span style="color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em;">Name</span><br>
-            <span style="color: var(--text-primary); font-size: 1.2rem;">{{ name }}</span>
+    <div class="profile-section">
+        <p class="profile-field">
+            <span class="profile-label">Name</span><br>
+            <span class="profile-value">{{ name }}</span>
         </p>
         <p>
-            <span style="color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em;">Email</span><br>
-            <span style="color: var(--text-primary); font-size: 1.2rem;">{{ form_email }}</span>
+            <span class="profile-label">Email</span><br>
+            <span class="profile-value">{{ form_email }}</span>
         </p>
     </div>
 {% else %}
@@ -33,8 +32,8 @@
     </form>
 {% endif %}
 
-<div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-subtle);">
-    <p style="font-size: 0.9rem; color: var(--text-muted);">
+<div class="info-section">
+    <p class="info-text">
         Your profile helps others recognize you when they receive a vouch or connection request.
     </p>
 </div>

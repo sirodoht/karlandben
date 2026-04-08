@@ -143,7 +143,7 @@
         nav {
             position: relative;
             z-index: 10;
-            padding: 0 2rem;
+            padding: 0 1.5rem;
             border-bottom: 1px solid var(--border-subtle);
             background: linear-gradient(to bottom, var(--bg-deep) 0%, transparent 100%);
         }
@@ -155,6 +155,7 @@
             align-items: center;
             justify-content: space-between;
             height: 72px;
+            box-sizing: border-box;
         }
 
         nav .brand {
@@ -213,6 +214,7 @@
         }
         @media (max-width: 768px) {
             nav { padding: 0 1rem; }
+            main { padding: 0 1rem; }
         }
 
         /* Main content */
@@ -221,13 +223,10 @@
             max-width: 900px;
             width: 100%;
             margin: 0 auto;
-            padding: 0 1.5rem;
+            padding: 0;
             position: relative;
             z-index: 5;
             box-sizing: border-box;
-        }
-        @media (max-width: 768px) {
-            main { padding: 0 1rem; }
         }
 
         h1 {
@@ -682,6 +681,62 @@
                 animation: none;
             }
         }
+
+        /* Auth pages styles */
+        .hero-compact {
+            padding-top: 4rem;
+        }
+
+        .form-inline {
+            display: inline;
+        }
+
+        .auth-helper-text {
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .auth-helper-text a {
+            color: var(--accent-moonlight);
+        }
+
+        /* Profile page styles */
+        .profile-section {
+            margin-bottom: 2rem;
+        }
+
+        .profile-field {
+            margin-bottom: 0.75rem;
+        }
+
+        .profile-label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .profile-value {
+            color: var(--text-primary);
+            font-size: 1.2rem;
+        }
+
+        .info-section {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .info-text {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        /* Verification page styles */
+        .verification-email {
+            color: var(--text-primary);
+        }
     </style>
 </head>
 <body>
@@ -724,7 +779,7 @@
                     {% if let Some(email) = email %}
                         <a href="/profile">{{ email }}</a>
                     {% endif %}
-                    <form method="post" action="/logout" style="display: inline;">
+                    <form method="post" action="/logout" class="form-inline">
                         <button type="submit">Log out</button>
                     </form>
                 {% else %}

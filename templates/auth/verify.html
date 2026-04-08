@@ -3,13 +3,13 @@
 {% block title %}Verify - karlandben{% endblock %}
 
 {% block content %}
-<div class="hero" style="padding-top: 4rem;">
+<div class="hero hero-compact">
     <h1>Enter verification code</h1>
     <div class="fog-divider"></div>
 </div>
 
 <p>
-    We've sent a 6-digit code to <strong style="color: var(--text-primary);">{{ form_email }}</strong>
+    We've sent a 6-digit code to <strong class="verification-email">{{ form_email }}</strong>
 </p>
 
 {% if let Some(error) = error %}
@@ -23,7 +23,7 @@
     <button type="submit">Verify</button>
 </form>
 
-<p style="margin-top: 2rem; font-size: 0.9rem; color: var(--text-muted);">
+<p class="auth-helper-text">
     Didn't receive it? <a href="/login">Request a new code</a>
 </p>
 {% endblock %}
