@@ -956,6 +956,15 @@
             gl.enable(gl.BLEND);
             gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
+            // Clear color - set once
+            gl.clearColor(0.0, 0.0, 0.0, 0.0);
+
+            // Set up static GL state - program, buffer, and vertex attributes
+            gl.useProgram(program);
+            gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+            gl.enableVertexAttribArray(a_position);
+            gl.vertexAttribPointer(a_position, 2, gl.FLOAT, false, 0, 0);
+
             // Animation state
             let startTime = performance.now();
             let animationId = null;
@@ -1003,23 +1012,9 @@
                 const timeSinceStart = currentTime - startTime;
                 frameCount++;
 
-                // Clear with transparency
-                gl.clearColor(0.0, 0.0, 0.0, 0.0);
                 gl.clear(gl.COLOR_BUFFER_BIT);
-
-                // Use program
-                gl.useProgram(program);
-
-                // Bind and enable position attribute
-                gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-                gl.enableVertexAttribArray(a_position);
-                gl.vertexAttribPointer(a_position, 2, gl.FLOAT, false, 0, 0);
-
-                // Set uniforms
                 gl.uniform2f(u_resolution, canvas.width, canvas.height);
                 gl.uniform1f(u_time, timeSinceStart);
-
-                // Draw full-screen quad
                 gl.drawArrays(gl.TRIANGLES, 0, 6);
             }
 
