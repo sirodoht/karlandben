@@ -4,7 +4,6 @@
 
 {% block content %}
 <div class="hero" style="padding-top: 4rem;">
-    <div class="section-label">Security check</div>
     <h1>Enter verification code</h1>
     <div class="fog-divider"></div>
 </div>
@@ -20,7 +19,7 @@
 <form method="post" action="/verify">
     <input type="hidden" name="email" value="{{ form_email }}">
     <label>6-digit code</label>
-    <input type="text" name="code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="off" required autofocus placeholder="000000">
+    <input type="text" name="code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="off" required autofocus>
     <button type="submit">Verify</button>
 </form>
 
