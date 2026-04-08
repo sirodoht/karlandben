@@ -1063,6 +1063,7 @@
             let shootingStars = [];
             let lastShootingStarTime = 0;
             let nextShootingStarDelay = 5000 + Math.random() * 15000; // 5-20s
+            let nextScheduledFrame = null; // For idle timeout scheduling
 
             function start() {
                 if (!running && !document.hidden && !prefersReducedMotion) {
@@ -1076,6 +1077,17 @@
                 if (animationId !== null) {
                     cancelAnimationFrame(animationId);
                     animationId = null;
+                }
+                if (nextScheduledFrame !== null) {
+                    clearTimeout(nextScheduledFrame);
+                    nextScheduledFrame = null;
+                }
+            }
+
+            // Render a single frame without starting continuous loop
+            function renderOnce() {
+                if (!document.hidden && !prefersReducedMotion) {
+                    drawConstellation();
                 }
             }
 
@@ -1117,6 +1129,11 @@
                     trail: [],
                     maxTrail: 15 + Math.floor(Math.random() * 10) // 15-25 trail segments
                 });
+
+                // Start continuous animation since shooting star needs it
+                if (!running) {
+                    start();
+                }
             }
 
             // Cache star pixel positions - updated on resize
@@ -1138,6 +1155,11 @@
             document.addEventListener('mousemove', (e) => {
                 mouseX = e.clientX;
                 mouseY = e.clientY;
+
+                // If not continuously animating, trigger a single render for interaction
+                if (!running && !prefersReducedMotion) {
+                    renderOnce();
+                }
             }, { passive: true });
 
             // Check visibility - properly start/stop the loop
@@ -1156,8 +1178,9 @@
             }
 
             function drawConstellation() {
-                if (!running) return;
-                animationId = requestAnimationFrame(drawConstellation);
+                if (running) {
+                    animationId = requestAnimationFrame(drawConstellation);
+                }
 
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -1316,6 +1339,25 @@
 
                 ctx.globalAlpha = 1;
                 ctx.shadowBlur = 0;
+
+                // Check if we can pause continuous animation
+                if (running) {
+                    const hasShootingStars = shootingStars.length > 0;
+                    const hasActiveConnections = activeConnections.size > 0;
+
+                    if (!hasShootingStars && !hasActiveConnections) {
+                        // No animation needed - pause continuous loop
+                        running = false;
+                        animationId = null;
+
+                        // Schedule a render when next shooting star should spawn
+                        const timeUntilNext = Math.max(0, nextShootingStarDelay - (now - lastShootingStarTime));
+                        nextScheduledFrame = setTimeout(() => {
+                            nextScheduledFrame = null;
+                            renderOnce();
+                        }, timeUntilNext);
+                    }
+                }
             }
 
             // Start the loop
