@@ -28,8 +28,8 @@ pub struct VerifyTemplate {
 }
 
 #[derive(Template)]
-#[template(path = "auth/register_name.html")]
-pub struct RegisterNameTemplate {
+#[template(path = "auth/profile.html")]
+pub struct ProfileTemplate {
     pub email: String,
     pub error: Option<String>,
 }

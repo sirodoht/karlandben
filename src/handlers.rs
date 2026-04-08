@@ -4,14 +4,14 @@ use crate::{
     models::{EmailForm, NameForm, VerifyForm},
     services::generate_code,
     session::{self, Session},
-    templates::{IndexTemplate, LoginTemplate, RegisterNameTemplate, SignupTemplate, VerifyTemplate},
+    templates::{IndexTemplate, LoginTemplate, ProfileTemplate, SignupTemplate, VerifyTemplate},
 };
 use askama::Template;
 use axum::{
+    Extension,
     extract::Form,
     http::header,
     response::{Html, IntoResponse, Redirect},
-    Extension,
 };
 use sqlx::SqlitePool;
 use tracing::{debug, error, info, instrument, warn};
@@ -75,7 +75,7 @@ pub async fn login(
                 .render()
                 .unwrap(),
             )
-            .into_response()
+            .into_response();
         }
     };
 
@@ -107,7 +107,7 @@ pub async fn login(
                 .render()
                 .unwrap(),
             )
-            .into_response()
+            .into_response();
         }
     };
 
@@ -151,7 +151,10 @@ pub async fn login(
                 error!(email = %email, error = %e, "Failed to send login code email");
                 return Html(
                     LoginTemplate {
-                        error: Some("Unable to send verification email. Please try again later.".to_string()),
+                        error: Some(
+                            "Unable to send verification email. Please try again later."
+                                .to_string(),
+                        ),
                     }
                     .render()
                     .unwrap(),
@@ -219,7 +222,7 @@ pub async fn signup(
                 .render()
                 .unwrap(),
             )
-            .into_response()
+            .into_response();
         }
     };
 
@@ -251,7 +254,7 @@ pub async fn signup(
                 .render()
                 .unwrap(),
             )
-            .into_response()
+            .into_response();
         }
     };
 
@@ -295,7 +298,10 @@ pub async fn signup(
                 error!(email = %email, error = %e, "Failed to send signup code email");
                 return Html(
                     SignupTemplate {
-                        error: Some("Unable to send verification email. Please try again later.".to_string()),
+                        error: Some(
+                            "Unable to send verification email. Please try again later."
+                                .to_string(),
+                        ),
                     }
                     .render()
                     .unwrap(),
@@ -354,7 +360,7 @@ pub async fn verify(
                 .render()
                 .unwrap(),
             )
-            .into_response()
+            .into_response();
         }
     };
 
@@ -374,15 +380,7 @@ pub async fn verify(
     match form.purpose.as_str() {
         "signup" => {
             // For signup, go to name registration page
-            Html(
-                RegisterNameTemplate {
-                    email,
-                    error: None,
-                }
-                .render()
-                .unwrap(),
-            )
-            .into_response()
+            Html(ProfileTemplate { email, error: None }.render().unwrap()).into_response()
         }
         "login" => {
             // For login, check if user needs to set name
@@ -398,20 +396,12 @@ pub async fn verify(
                         .render()
                         .unwrap(),
                     )
-                    .into_response()
+                    .into_response();
                 }
             };
 
             if needs_name {
-                Html(
-                    RegisterNameTemplate {
-                        email,
-                        error: None,
-                    }
-                    .render()
-                    .unwrap(),
-                )
-                .into_response()
+                Html(ProfileTemplate { email, error: None }.render().unwrap()).into_response()
             } else {
                 // Complete login - create session
                 let (user_id, _user_name) = match database::get_user_by_email(&pool, &email).await {
@@ -448,7 +438,7 @@ pub async fn verify(
                 match database::create_session(&pool, user_id, &token, max_age_days).await {
                     Ok(_) => {
                         info!(user_id, email = %email, "User logged in successfully");
-                        
+
                         // Build response with session cookie
                         let mut response = Redirect::to("/").into_response();
                         if let Some(cookie) = session::build_session_cookie(&token) {
@@ -493,7 +483,7 @@ pub async fn register_name(
     if name.is_empty() {
         warn!("Empty name submitted");
         return Html(
-            RegisterNameTemplate {
+            ProfileTemplate {
                 email,
                 error: Some("Name is required".to_string()),
             }
@@ -512,14 +502,14 @@ pub async fn register_name(
         Err(_) => {
             error!("Database error checking user existence during name registration");
             return Html(
-                RegisterNameTemplate {
+                ProfileTemplate {
                     email,
                     error: Some("Database error".to_string()),
                 }
                 .render()
                 .unwrap(),
             )
-            .into_response()
+            .into_response();
         }
     };
 
@@ -532,27 +522,27 @@ pub async fn register_name(
                     Ok(Some(id)) => id,
                     _ => {
                         return Html(
-                            RegisterNameTemplate {
+                            ProfileTemplate {
                                 email,
                                 error: Some("Database error".to_string()),
                             }
                             .render()
                             .unwrap(),
                         )
-                        .into_response()
+                        .into_response();
                     }
                 }
             }
             Err(_) => {
                 return Html(
-                    RegisterNameTemplate {
+                    ProfileTemplate {
                         email,
                         error: Some("Database error".to_string()),
                     }
                     .render()
                     .unwrap(),
                 )
-                .into_response()
+                .into_response();
             }
         }
     } else {
@@ -561,14 +551,14 @@ pub async fn register_name(
             Ok(id) => id,
             Err(_) => {
                 return Html(
-                    RegisterNameTemplate {
+                    ProfileTemplate {
                         email,
                         error: Some("Database error".to_string()),
                     }
                     .render()
                     .unwrap(),
                 )
-                .into_response()
+                .into_response();
             }
         }
     };
@@ -579,7 +569,7 @@ pub async fn register_name(
     match database::create_session(&pool, user_id, &token, max_age_days).await {
         Ok(_) => {
             info!(user_id, email = %email, "User registered and logged in successfully");
-            
+
             // Build response with session cookie
             let mut response = Redirect::to("/").into_response();
             if let Some(cookie) = session::build_session_cookie(&token) {
@@ -590,7 +580,7 @@ pub async fn register_name(
         Err(e) => {
             error!(error = ?e, "Failed to create session");
             Html(
-                RegisterNameTemplate {
+                ProfileTemplate {
                     email,
                     error: Some("Database error".to_string()),
                 }
@@ -603,23 +593,22 @@ pub async fn register_name(
 }
 
 #[instrument(skip(session))]
-pub async fn logout(
-    Extension(pool): Extension<SqlitePool>,
-    session: Session,
-) -> impl IntoResponse {
+pub async fn logout(Extension(pool): Extension<SqlitePool>, session: Session) -> impl IntoResponse {
     // Delete session from database if exists
     if let Some(token) = session.token {
         if let Err(e) = database::delete_session(&pool, &token).await {
             error!(error = ?e, "Failed to delete session");
         }
     }
-    
+
     if let Some(user_id) = session.user_id {
         info!(user_id, "User logged out");
     }
-    
+
     // Build response with cleared cookie
     let mut response = Redirect::to("/").into_response();
-    response.headers_mut().insert(header::SET_COOKIE, session::clear_session_cookie());
+    response
+        .headers_mut()
+        .insert(header::SET_COOKIE, session::clear_session_cookie());
     response
 }
