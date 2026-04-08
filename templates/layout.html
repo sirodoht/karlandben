@@ -5,15 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}fogpub{% endblock %}</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            line-height: 1.6;
+            margin: 0;
+            font-family: sans-serif;
+            line-height: 1.5;
             color: #333;
             min-height: 100vh;
             display: flex;
@@ -44,6 +39,7 @@
 
         nav .brand:hover {
             opacity: 0.8;
+            text-decoration: none;
         }
 
         nav .nav-links {
