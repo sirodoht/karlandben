@@ -1064,10 +1064,12 @@
             let lastShootingStarTime = 0;
             let nextShootingStarDelay = 5000 + Math.random() * 15000; // 5-20s
             let nextScheduledFrame = null; // For idle timeout scheduling
+            let lastFrameTime = performance.now(); // For deltaTime calculations
 
             function start() {
                 if (!running && !document.hidden && !prefersReducedMotion) {
                     running = true;
+                    lastFrameTime = performance.now();
                     animationId = requestAnimationFrame(drawConstellation);
                 }
             }
@@ -1085,9 +1087,14 @@
             }
 
             // Render a single frame without starting continuous loop
+            // BUT if there are active connections, start the loop to let them fade out
             function renderOnce() {
                 if (!document.hidden && !prefersReducedMotion) {
                     drawConstellation();
+                    // If connections are active, we need the loop running to fade them out
+                    if (activeConnections.size > 0 && !running) {
+                        start();
+                    }
                 }
             }
 
@@ -1182,10 +1189,14 @@
                     animationId = requestAnimationFrame(drawConstellation);
                 }
 
+                // Calculate delta time for frame-rate independent animation
+                const now = performance.now();
+                const dt = Math.min((now - lastFrameTime) / 1000, 0.1); // Cap at 100ms to prevent jumps
+                lastFrameTime = now;
+
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
                 // Spawn shooting stars
-                const now = performance.now();
                 if (now - lastShootingStarTime > nextShootingStarDelay) {
                     spawnShootingStar();
                     lastShootingStarTime = now;
@@ -1202,10 +1213,10 @@
                         star.trail.shift();
                     }
 
-                    // Update position
-                    star.x += star.vx;
-                    star.y += star.vy;
-                    star.life -= 0.015; // Fade out over time
+                    // Update position (velocity is in pixels/second for consistency)
+                    star.x += star.vx * 60 * dt; // Scale to 60fps equivalent
+                    star.y += star.vy * 60 * dt;
+                    star.life -= 0.9 * dt; // Fade out over ~1.1 seconds regardless of frame rate
 
                     // Update trail fade
                     star.trail.forEach((t, idx) => {
@@ -1272,18 +1283,21 @@
                 nearbyStars.sort((a, b) => a.distSq - b.distSq);
                 const connectedStars = nearbyStars.slice(0, maxConnections);
 
-                // Fade in new connections
+                // Fade in new connections (time-based lerp)
+                // Equivalent to 0.15 per frame at 60fps: (1 - exp(-10 * dt))
                 connectedStars.forEach(({ index, distSq }) => {
                     const targetOpacity = 1 - Math.sqrt(distSq / connectRadiusSq);
                     const current = activeConnections.get(index) || 0;
-                    activeConnections.set(index, current + (targetOpacity - current) * 0.15);
+                    const lerpFactor = 1 - Math.exp(-10 * dt);
+                    activeConnections.set(index, current + (targetOpacity - current) * lerpFactor);
                 });
 
-                // Fade out old connections
+                // Fade out old connections (time-based exponential decay)
+                // Equivalent to 0.92 per frame at 60fps: exp(-5 * dt)
                 activeConnections.forEach((opacity, index) => {
                     const isStillConnected = connectedStars.some(s => s.index === index);
                     if (!isStillConnected) {
-                        const newOpacity = opacity * 0.92;
+                        const newOpacity = opacity * Math.exp(-5 * dt);
                         if (newOpacity < 0.01) {
                             activeConnections.delete(index);
                         } else {
