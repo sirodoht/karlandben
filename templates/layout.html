@@ -58,7 +58,7 @@
             height: 100%;
             pointer-events: none;
             z-index: 1;
-            background-image: 
+            background-image:
                 radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.8), transparent),
                 radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.6), transparent),
                 radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.9), transparent),
@@ -211,6 +211,9 @@
         nav .nav-links a:hover, nav button:hover {
             color: var(--text-primary);
         }
+        @media (max-width: 768px) {
+            nav { padding: 0 1rem; }
+        }
 
         /* Main content */
         main {
@@ -221,6 +224,10 @@
             padding: 0 1.5rem;
             position: relative;
             z-index: 5;
+            box-sizing: border-box;
+        }
+        @media (max-width: 768px) {
+            main { padding: 0 1rem; }
         }
 
         h1 {
@@ -231,6 +238,9 @@
             margin: 0 0 1.5rem;
             color: var(--text-primary);
             letter-spacing: -0.02em;
+        }
+        @media (max-width: 768px) {
+            h1 { font-size: 2.4rem; }
         }
 
         h2 {
@@ -313,6 +323,7 @@
             color: var(--text-primary);
             transition: all 0.3s ease;
             backdrop-filter: blur(10px);
+            box-sizing: border-box;
         }
 
         input:focus {
@@ -349,6 +360,9 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+        }
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.8rem; }
         }
 
         .hero-subtitle {
@@ -473,14 +487,6 @@
         .fade-in-delay-2 { animation-delay: 0.2s; }
         .fade-in-delay-3 { animation-delay: 0.3s; }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            h1 { font-size: 2.4rem; }
-            .hero h1 { font-size: 2.8rem; }
-            nav { padding: 0 1rem; }
-            main { padding: 0 1rem; }
-        }
-
         /* Reduce motion preference */
         @media (prefers-reduced-motion: reduce) {
             .grain {
@@ -509,7 +515,6 @@
             animation: ghostFloat 3s ease-in-out infinite;
             transition: transform 0.3s ease;
         }
-
         .ghost:hover {
             transform: scale(1.1);
         }
@@ -517,13 +522,13 @@
         .ghost-body {
             width: 70px;
             height: 75px;
-            background: linear-gradient(180deg, 
-                rgba(255, 255, 255, 0.95) 0%, 
+            background: linear-gradient(180deg,
+                rgba(255, 255, 255, 0.95) 0%,
                 rgba(240, 248, 255, 0.85) 50%,
                 rgba(230, 240, 250, 0.75) 100%);
             border-radius: 50% 50% 45% 45%;
             position: relative;
-            box-shadow: 
+            box-shadow:
                 0 0 30px rgba(200, 220, 255, 0.4),
                 0 0 60px rgba(180, 200, 255, 0.2),
                 inset 0 -5px 15px rgba(180, 200, 255, 0.3);
@@ -607,8 +612,8 @@
         .tail-segment {
             width: 18px;
             height: 20px;
-            background: linear-gradient(180deg, 
-                rgba(230, 240, 250, 0.7) 0%, 
+            background: linear-gradient(180deg,
+                rgba(230, 240, 250, 0.7) 0%,
                 rgba(230, 240, 250, 0) 100%);
             border-radius: 0 0 50% 50%;
             animation: tailWave 2s ease-in-out infinite;
@@ -631,8 +636,8 @@
         .ghost-waves span {
             width: 10px;
             height: 8px;
-            background: linear-gradient(180deg, 
-                rgba(230, 240, 250, 0.5) 0%, 
+            background: linear-gradient(180deg,
+                rgba(230, 240, 250, 0.5) 0%,
                 transparent 100%);
             border-radius: 50%;
             animation: waveMotion 1.5s ease-in-out infinite;
@@ -704,13 +709,6 @@
         @keyframes waveMotion {
             0%, 100% { transform: translateY(0); opacity: 0.6; }
             50% { transform: translateY(-3px); opacity: 0.3; }
-        }
-
-        /* Hide ghost on mobile to save space */
-        @media (max-width: 768px) {
-            .ghost-container {
-                display: none;
-            }
         }
 
         /* Reduce motion for ghost */
@@ -904,7 +902,7 @@
                     float drift1 = time * 0.02;
                     float drift2 = time * 0.012;
                     float drift3 = time * 0.007;
-                    
+
                     float clouds1 = turbulentClouds(cloudPos * 0.8 + vec2(drift1, 0.0), time);
                     float clouds2 = turbulentClouds(cloudPos * 1.2 - vec2(drift2, drift2 * 0.2) + vec2(5.2), time * 0.002);
                     float clouds3 = turbulentClouds(cloudPos * 2.0 + vec2(0.0, drift3) + vec2(10.0), time * 0.00125);
@@ -927,7 +925,7 @@
                     vec3 nebulaColor = mix(deepSpace, darkNebula, smoothstep(0.0, 0.4, cloudDensity));
                     nebulaColor = mix(nebulaColor, midNebula, smoothstep(0.3, 0.7, cloudDensity));
                     nebulaColor = mix(nebulaColor, brightNebula, smoothstep(0.6, 0.9, cloudDensity));
-                    
+
                     // Add cyan gas wisps to brightest areas
                     float cyanMask = smoothstep(0.75, 0.95, cloudDensity);
                     nebulaColor = mix(nebulaColor, cyanGlow, cyanMask * 0.4);
@@ -1086,7 +1084,7 @@
         (function() {
             const canvas = document.getElementById('constellation-canvas');
             const ctx = canvas.getContext('2d');
-            
+
             // Star positions matching the CSS radial-gradient stars
             const stars = [
                 { x: 0.020, y: 0.030, size: 2 },
@@ -1110,26 +1108,26 @@
                 { x: 0.850, y: 0.520, size: 2 },
                 { x: 0.950, y: 0.300, size: 1 },
             ];
-            
+
             let mouseX = -1000;
             let mouseY = -1000;
             let activeConnections = new Map(); // star index -> opacity
             let animationId;
             let isVisible = true;
-            
+
             // Shooting stars
             let shootingStars = [];
             let lastShootingStarTime = 0;
             let nextShootingStarDelay = 5000 + Math.random() * 15000; // 5-20s
-            
+
             function spawnShootingStar() {
                 // Random starting edge: 0=top, 1=right, 2=left (avoid bottom)
                 const edge = Math.floor(Math.random() * 3);
                 let x, y, vx, vy;
-                
+
                 const speed = 4 + Math.random() * 3; // Speed: 4-7 pixels per frame
                 const angle = (Math.random() * 60 + 30) * Math.PI / 180; // 30-90 degree angle
-                
+
                 switch(edge) {
                     case 0: // Top edge - shoot down-right or down-left
                         x = Math.random() * canvas.width;
@@ -1150,7 +1148,7 @@
                         vy = speed * Math.sin(angle);
                         break;
                 }
-                
+
                 shootingStars.push({
                     x: x,
                     y: y,
@@ -1161,37 +1159,37 @@
                     maxTrail: 15 + Math.floor(Math.random() * 10) // 15-25 trail segments
                 });
             }
-            
+
             function resize() {
                 canvas.width = window.innerWidth;
                 canvas.height = window.innerHeight;
             }
             resize();
             window.addEventListener('resize', resize, { passive: true });
-            
+
             // Track mouse
             document.addEventListener('mousemove', (e) => {
                 mouseX = e.clientX;
                 mouseY = e.clientY;
             }, { passive: true });
-            
+
             // Check visibility
             document.addEventListener('visibilitychange', () => {
                 isVisible = !document.hidden;
             });
-            
+
             function getDistance(x1, y1, x2, y2) {
                 return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
             }
-            
+
             function drawConstellation() {
                 if (!isVisible) {
                     animationId = requestAnimationFrame(drawConstellation);
                     return;
                 }
-                
+
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                
+
                 // Spawn shooting stars
                 const now = performance.now();
                 if (now - lastShootingStarTime > nextShootingStarDelay) {
@@ -1199,34 +1197,34 @@
                     lastShootingStarTime = now;
                     nextShootingStarDelay = 5000 + Math.random() * 15000; // Reset 5-20s timer
                 }
-                
+
                 // Update and draw shooting stars
                 for (let i = shootingStars.length - 1; i >= 0; i--) {
                     const star = shootingStars[i];
-                    
+
                     // Add current position to trail
                     star.trail.push({ x: star.x, y: star.y, life: 1.0 });
                     if (star.trail.length > star.maxTrail) {
                         star.trail.shift();
                     }
-                    
+
                     // Update position
                     star.x += star.vx;
                     star.y += star.vy;
                     star.life -= 0.015; // Fade out over time
-                    
+
                     // Update trail fade
                     star.trail.forEach((t, idx) => {
                         t.life = idx / star.trail.length;
                     });
-                    
+
                     // Remove if off screen or faded
-                    if (star.life <= 0 || star.x < -100 || star.x > canvas.width + 100 || 
+                    if (star.life <= 0 || star.x < -100 || star.x > canvas.width + 100 ||
                         star.y < -100 || star.y > canvas.height + 100) {
                         shootingStars.splice(i, 1);
                         continue;
                     }
-                    
+
                     // Draw trail
                     if (star.trail.length > 1) {
                         for (let j = 0; j < star.trail.length - 1; j++) {
@@ -1234,14 +1232,14 @@
                             const t2 = star.trail[j + 1];
                             const alpha = t1.life * star.life * 0.8;
                             const lineWidth = t1.life * 3;
-                            
+
                             if (alpha > 0.01) {
                                 ctx.strokeStyle = `rgba(200, 240, 255, ${alpha})`;
                                 ctx.lineWidth = lineWidth;
                                 ctx.lineCap = 'round';
                                 ctx.shadowBlur = 6 * t1.life;
                                 ctx.shadowColor = 'rgba(100, 200, 255, 0.6)';
-                                
+
                                 ctx.beginPath();
                                 ctx.moveTo(t1.x, t1.y);
                                 ctx.lineTo(t2.x, t2.y);
@@ -1249,7 +1247,7 @@
                             }
                         }
                     }
-                    
+
                     // Draw shooting star head
                     ctx.shadowBlur = 15;
                     ctx.shadowColor = 'rgba(200, 240, 255, 0.9)';
@@ -1258,36 +1256,36 @@
                     ctx.arc(star.x, star.y, 3, 0, Math.PI * 2);
                     ctx.fill();
                 }
-                
+
                 ctx.shadowBlur = 0;
-                
+
                 const connectRadius = 150; // Pixels within which to connect
                 const maxConnections = 3; // Max stars to connect to at once
-                
+
                 // Update active connections based on mouse proximity
                 const nearbyStars = [];
-                
+
                 stars.forEach((star, index) => {
                     const sx = star.x * canvas.width;
                     const sy = star.y * canvas.height;
                     const dist = getDistance(mouseX, mouseY, sx, sy);
-                    
+
                     if (dist < connectRadius) {
                         nearbyStars.push({ index, dist, x: sx, y: sy });
                     }
                 });
-                
+
                 // Sort by distance and take closest
                 nearbyStars.sort((a, b) => a.dist - b.dist);
                 const connectedStars = nearbyStars.slice(0, maxConnections);
-                
+
                 // Fade in new connections
                 connectedStars.forEach(({ index, dist }) => {
                     const targetOpacity = 1 - (dist / connectRadius);
                     const current = activeConnections.get(index) || 0;
                     activeConnections.set(index, current + (targetOpacity - current) * 0.15);
                 });
-                
+
                 // Fade out old connections
                 activeConnections.forEach((opacity, index) => {
                     const isStillConnected = connectedStars.some(s => s.index === index);
@@ -1300,27 +1298,27 @@
                         }
                     }
                 });
-                
+
                 // Draw connections
                 if (connectedStars.length > 1) {
                     ctx.strokeStyle = 'rgba(180, 140, 220, 0.6)';
                     ctx.lineWidth = 1.5;
                     ctx.shadowBlur = 8;
                     ctx.shadowColor = 'rgba(200, 160, 255, 0.5)';
-                    
+
                     // Draw lines between connected stars
                     for (let i = 0; i < connectedStars.length - 1; i++) {
                         const star1 = connectedStars[i];
                         const star2 = connectedStars[i + 1];
                         const avgOpacity = (activeConnections.get(star1.index) + activeConnections.get(star2.index)) / 2;
-                        
+
                         ctx.globalAlpha = avgOpacity * 0.7;
                         ctx.beginPath();
                         ctx.moveTo(star1.x, star1.y);
                         ctx.lineTo(star2.x, star2.y);
                         ctx.stroke();
                     }
-                    
+
                     // Draw line from mouse to closest star
                     if (connectedStars.length > 0) {
                         const closest = connectedStars[0];
@@ -1332,7 +1330,7 @@
                         ctx.stroke();
                     }
                 }
-                
+
                 // Draw active star glows
                 ctx.shadowBlur = 12;
                 ctx.shadowColor = 'rgba(255, 200, 150, 0.8)';
@@ -1340,20 +1338,20 @@
                     const star = stars[index];
                     const sx = star.x * canvas.width;
                     const sy = star.y * canvas.height;
-                    
+
                     ctx.globalAlpha = opacity;
                     ctx.fillStyle = 'rgba(255, 220, 180, 0.9)';
                     ctx.beginPath();
                     ctx.arc(sx, sy, star.size + 1, 0, Math.PI * 2);
                     ctx.fill();
                 });
-                
+
                 ctx.globalAlpha = 1;
                 ctx.shadowBlur = 0;
-                
+
                 animationId = requestAnimationFrame(drawConstellation);
             }
-            
+
             drawConstellation();
         })();
 
@@ -1361,7 +1359,7 @@
         (function() {
             const ghost = document.getElementById('casper');
             const bubble = document.getElementById('ghost-bubble');
-            
+
             const messages = [
                 "boo! 👻",
                 "looking for roommates?",
@@ -1376,75 +1374,75 @@
                 "the wifi password is...",
                 "shh, they're sleeping",
             ];
-            
+
             let messageIndex = 0;
             let bubbleTimeout;
-            
+
             // Eye tracking - ghost eyes follow cursor subtly
             document.addEventListener('mousemove', (e) => {
                 const eyes = ghost.querySelectorAll('.eye');
                 const ghostRect = ghost.getBoundingClientRect();
                 const ghostCenterX = ghostRect.left + ghostRect.width / 2;
                 const ghostCenterY = ghostRect.top + ghostRect.height / 2;
-                
+
                 const angle = Math.atan2(e.clientY - ghostCenterY, e.clientX - ghostCenterX);
                 const distance = Math.min(3, Math.hypot(e.clientX - ghostCenterX, e.clientY - ghostCenterY) / 100);
-                
+
                 const x = Math.cos(angle) * distance;
                 const y = Math.sin(angle) * distance;
-                
+
                 eyes.forEach(eye => {
                     eye.style.transform = `translate(${x}px, ${y}px)`;
                 });
             }, { passive: true });
-            
+
             // Click to show message
             ghost.addEventListener('click', () => {
                 // Random message or cycle through
                 const message = messages[Math.floor(Math.random() * messages.length)];
                 bubble.textContent = message;
                 bubble.classList.add('visible');
-                
+
                 // Playful bounce animation
                 ghost.style.animation = 'none';
                 setTimeout(() => {
                     ghost.style.animation = 'ghostFloat 3s ease-in-out infinite, ghostBounce 0.5s ease';
                 }, 10);
-                
+
                 // Reset animation after bounce
                 setTimeout(() => {
                     ghost.style.animation = 'ghostFloat 3s ease-in-out infinite';
                 }, 500);
-                
+
                 // Hide bubble after 3 seconds
                 clearTimeout(bubbleTimeout);
                 bubbleTimeout = setTimeout(() => {
                     bubble.classList.remove('visible');
                 }, 3000);
             });
-            
+
             // Peek-a-boo: Ghost hides when scrolling fast
             let lastScrollY = window.scrollY;
             let scrollTimeout;
-            
+
             window.addEventListener('scroll', () => {
                 const currentScrollY = window.scrollY;
                 const scrollSpeed = Math.abs(currentScrollY - lastScrollY);
-                
+
                 if (scrollSpeed > 50) {
                     ghost.style.transform = 'translateY(100px) scale(0.8)';
                     ghost.style.opacity = '0.3';
                 }
-                
+
                 clearTimeout(scrollTimeout);
                 scrollTimeout = setTimeout(() => {
                     ghost.style.transform = '';
                     ghost.style.opacity = '';
                 }, 150);
-                
+
                 lastScrollY = currentScrollY;
             }, { passive: true });
-            
+
             // Add bounce animation keyframes dynamically
             const style = document.createElement('style');
             style.textContent = `
