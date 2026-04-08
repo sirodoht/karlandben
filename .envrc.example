@@ -1,4 +1,12 @@
 export RUST_LOG=fogpub=debug
+
+# Email backend configuration
+# Options:
+#   - smtp: Send emails via SMTP (requires all SMTP_* variables below)
+#   - console: Print emails to stdout instead of sending (useful for development)
+export EMAIL_BACKEND=console
+
+# SMTP configuration (required when EMAIL_BACKEND=smtp)
 export SMTP_HOST=smtp.postmarkapp.com
 export SMTP_USER=
 export SMTP_PASSWORD=
