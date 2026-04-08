@@ -6,6 +6,20 @@
 cargo watch -x run
 ```
 
+## Linting
+
+Run lints with:
+
+```sh
+cargo clippy
+```
+
+Format code with:
+
+```sh
+cargo fmt
+```
+
 ## Commit Message Style
 
 Use [Conventional Commits](https://www.conventionalcommits.org/) format:

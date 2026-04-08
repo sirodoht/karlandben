@@ -78,17 +78,6 @@ pub async fn validate_and_use_token(
     }
 }
 
-// Create user with name
-pub async fn create_user(pool: &SqlitePool, email: &str, name: &str) -> Result<i64, DbError> {
-    let id = sqlx::query("INSERT INTO users (email, name) VALUES (?, ?)")
-        .bind(email)
-        .bind(name)
-        .execute(pool)
-        .await?
-        .last_insert_rowid();
-    Ok(id)
-}
-
 // Update user name
 pub async fn update_user_name(pool: &SqlitePool, email: &str, name: &str) -> Result<(), DbError> {
     sqlx::query("UPDATE users SET name = ? WHERE email = ?")
@@ -97,15 +86,6 @@ pub async fn update_user_name(pool: &SqlitePool, email: &str, name: &str) -> Res
         .execute(pool)
         .await?;
     Ok(())
-}
-
-// Check if user exists
-pub async fn user_exists(pool: &SqlitePool, email: &str) -> Result<bool, DbError> {
-    let result: Option<(i64,)> = sqlx::query_as("SELECT id FROM users WHERE email = ?")
-        .bind(email)
-        .fetch_optional(pool)
-        .await?;
-    Ok(result.is_some())
 }
 
 // Check if user needs to set name (returns true if user doesn't exist or has no name)
@@ -147,15 +127,6 @@ pub async fn get_user_by_email(
             .fetch_optional(pool)
             .await?;
     Ok(result)
-}
-
-// Get user id by email
-pub async fn get_user_id_by_email(pool: &SqlitePool, email: &str) -> Result<Option<i64>, DbError> {
-    let result: Option<(i64,)> = sqlx::query_as("SELECT id FROM users WHERE email = ?")
-        .bind(email)
-        .fetch_optional(pool)
-        .await?;
-    Ok(result.map(|(id,)| id))
 }
 
 // Session functions
